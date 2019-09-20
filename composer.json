@@ -1,0 +1,25 @@
+{
+    "name": "Babakin/sdk-api-iml",
+    "type": "library",
+    "description": "PHP wrapper for iml api",
+
+    "require": {
+        "php": "^7.1",
+        "guzzlehttp/guzzle": "^6.3"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Николай Бабакин",
+            "email": "kolyafat2012@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "IMLSdk\\": "src/"
+        }
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^4.3"
+    }
+}
