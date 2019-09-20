@@ -1,5 +1,5 @@
 {
-    "name": "Babakin/sdk-api-iml",
+    "name": "babakin/sdk-api-iml",
     "type": "library",
     "description": "PHP wrapper for iml api",
 
