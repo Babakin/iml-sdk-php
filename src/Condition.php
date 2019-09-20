@@ -65,7 +65,7 @@ class Condition
      * @param object $data
      * @return Condition
      */
-    public static function buildCondition(object $data) :Condition{
+    public static function buildCondition(\stdClass $data) :Condition{
         $condition = new self;
         $condition->productNo = $data->Code;
         $condition->allowed = false;

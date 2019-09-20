@@ -27,10 +27,10 @@ class Container
     }
 
     /**
-     * @param $data
+     * @param object $data
      * @return Condition
      */
-    public function getCondition($data){
+    public function getCondition(\stdClass $data){
         return Condition::buildCondition($data);
     }
 
