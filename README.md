@@ -16,7 +16,7 @@
 Via Composer:
 
 ```bash
-$ composer require 
+$ composer require babakin/sdk-api-iml
 ```
 
 
