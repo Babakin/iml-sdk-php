@@ -1,5 +1,5 @@
 # PHP SDK IML API
-
+![IML](https://iml.ru/logo/logo)
 
 Обертка для http://api.iml.ru на PHP.
 
@@ -35,7 +35,7 @@ $order = new \IMLSdk\Order('24КО');
 ```php
 $order->testMode();
 ```
-Добавляем данные доставки. Данные для регионов `$order->regionCodes($from,$to)` берем из http://api.iml.ru/region:
+Добавляем данные доставки. Данные для регионов `$order->regionCodes($from,$to)` берем из [справочника](http://api.iml.ru/region):
 ```php
 $order->regionCodes('МОСКВА','АНАПА');
 $order->setContacts('84893087496','megaivanych@gmail.com','Иваныч');
@@ -85,6 +85,48 @@ $client->setOrder($order);
 $responsePrice = $client->calculate();
 $responseOrder = $client->createOrder();
 ```
+#Доставка самовывозом до пункта выдачи заказов (ПВЗ)
+В sdk доступны четыре услуги (варианта доставки) С24, С24КО, 24, 24КО из справочника [услуг](http://api.iml.ru/list/service) (требуется авторизация).
+Услуги С24,С24КО подразумевают доставку отправления на ПВЗ. 
+Создание заказа на доставку на ПВЗ:
+```php
+    /**
+     * @return array|Point[]
+     * @throws ExceptionIMLClient
+     */
+//Получаем все возможные ПВЗ
+$client->getDeliveryPoints();
+
+//Получаем определенную ПВЗ по коду из справочника 
+$point = $client->getPointByCode('АНАПА_ПС3');
+
+```
+***Внимание!! Услуги передаются кириллицей!***
+
+Далее просто указываем ПВЗ, в который необходимо доставить отправление:
+```php
+$order = new \IMLSdk\Order('С24КО')//С24;
+$order->setPointTo($point);
+```
+При указании ПВЗ при самовывозе регион получения указывать не обязательно:
+```php
+$order->regionFrom('МОСКВА');
+//или
+$order->regionCodes('МОСКВА');
+```
+
+И далее:
+
+```php
+$client->setOrder($order);
+$responsePrice = $client->calculate();
+$responseOrder = $client->createOrder();
+```
+
+Справочник [ПВЗ](http://api.iml.ru/list/sd).
+
+####
+
 
 
 ## License
