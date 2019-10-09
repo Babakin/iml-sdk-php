@@ -69,7 +69,7 @@ $order->setAddressDelivery('Ленина 1, кв34');
 $cityCollection = $imlClient->getRegionByCity('Воронеж');
 ```
 `$cityCollection`:
-```json
+```editorconfig
 CityCollection {#17 ▼
   #type: "City"
   #collection: array:1 [▼
@@ -99,7 +99,7 @@ $region = $cityCollection->first()->getRegion();
 $imlClient->getRegionByCity('Алексеевка')
 ```
 Так как Алексеевок много он вернет все варианты:
-```json
+```editorconfig
 CityCollection {#17 ▼
   #type: "City"
   #collection: array:5 [▼
@@ -138,7 +138,7 @@ CityCollection {#17 ▼
 $conditionCollection = $imlClient->getConditions();
 ```
 Результат:
-```json
+```editorconfig
 ConditionCollection {#17 ▼
   #type: "Condition"
   #collection: array:15 [▼
