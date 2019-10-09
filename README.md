@@ -29,83 +29,182 @@ $ composer require babakin/sdk-api-iml
 require_once __DIR__ . '/vendor/autoload.php';
 
 
-$order = new \IMLSdk\Order('24КО');
+use IMLSdk\Factory;
+use IMLSdk\IMLClient;
+use IMLSdk\Item;
+
+
+$imlClient = new IMLClient(new Factory());
+```
+После инициализации пустого клиента необходимо его авторизовать. 
+Авторизацию можно осуществить и после внесения нужных данных, 
+однако запросы, связанные с получением данных с iml не отработают.
+
+```php
+$imlClient->logIn('УНК','пароль');
+```
+Проверить авторизацию можно так:
+```php
+$imlClient->isAuth(); //bool
+```
+В sdk доступны четыре услуги (варианта доставки) С24, С24КО, 24, 24КО из 
+справочника [услуг](http://api.iml.ru/list/service) (требуется авторизация).
+Для услуг доставки курьером (24,24КО) пункты назначения ПВЗ указывать не нужно. 
+Создаем новый заказ:
+```php
+$order = $imlClient->getOrderInstance('24КО');
 ```
 Активируем тестовый режим при необходимости:
 ```php
 $order->testMode();
 ```
-Добавляем данные доставки. Данные для регионов `$order->regionCodes($from,$to)` берем из [справочника](http://api.iml.ru/region):
+Добавляем данные доставки. Данные для регионов `$order->regionCodes($from,$to)` берем из [справочника](http://list.iml.ru/RegionCity):
 ```php
 $order->regionCodes('МОСКВА','АНАПА');
 $order->setContacts('84893087496','megaivanych@gmail.com','Иваныч');
 $order->setAddressDelivery('Ленина 1, кв34');
 ```
-
-Для расчета стоимости `$client->calculate()` и создания заказа `$client->createOrder()` необходимо создать грузовые места и товарные 
-вложения этих грузовых мест (передача пустого грузового места приведет к ошибке).
-Создаем товарное вложение с параметрами: Название, Вес, Стоимость и Наложенная стоимость (не обязательный):
+Также код региона доставки можно получить методом:
 ```php
-$item = new \IMLSdk\Item('Семена Цветной капусты СКАЙВОКЕР',2.3,1000,1000);
+$cityCollection = $imlClient->getRegionByCity('Воронеж');
 ```
-Можно добавить любое свойство обьекта `Item` через сеттер, имя свойства через CamelCase. 
-
-Пример:  
-``` php 
-$item->setDiscount(10); 
-$item->setItemNote('Заметочка') 
+`$cityCollection`:
+```json
+CityCollection {#17 ▼
+  #type: "City"
+  #collection: array:1 [▼
+    0 => City {#29 ▼
+      #City: "ВОРОНЕЖ"
+      #Region: "ВОРОНЕЖСКАЯ ОБЛАСТЬ"
+      #Area: ""
+      #RegionIML: "ВОРОНЕЖ"
+      #RateZoneMoscow: "B"
+      #RateZoneSpb: "C"
+    }
+  ]
+}
 ```
-
-Количество товарных однотипных вложений:
+Далее регион можем получить так:
 ```php
-$item->setItemQuantity(3);
+//first() вернет первый элемент коллекции
+$region = $cityCollection->first()->getRegion();
 ```
-Грузовое место для товарных вложений:
+Результатом будет регион доставки, который можно передавать в заказ `$order->regionCodes('МОСКВА',$region);`
+```json
+"ВОРОНЕЖ"
+```
+Метод `->getRegionByCity(string $city)` возвращает коллекцию, в которой может быть не один обьект `City`.
+Пример:
 ```php
-$pack = new \IMLSdk\Package($item);
+$imlClient->getRegionByCity('Алексеевка')
 ```
-Добавить товарное вложение, установить габариты грузового места:
+Так как Алексеевок много он вернет все варианты:
+```json
+CityCollection {#17 ▼
+  #type: "City"
+  #collection: array:5 [▼
+    0 => City {#29 ▼
+      #City: "АЛЕКСЕЕВКА"
+      #Region: "БЕЛГОРОДСКАЯ ОБЛАСТЬ"
+      #Area: "ЯКОВЛЕВСКИЙ РАЙОН"
+      #RegionIML: "ТОМАРОВКА"
+      #RateZoneMoscow: "C"
+      #RateZoneSpb: "D"
+    }
+    1 => City {#26 ▼
+      #City: "АЛЕКСЕЕВКА"
+      #Region: "БЕЛГОРОДСКАЯ ОБЛАСТЬ"
+      #Area: "КОРОЧАНСКИЙ РАЙОН"
+      #RegionIML: "ШОПИНО"
+      #RateZoneMoscow: "C"
+      #RateZoneSpb: "D"
+    }
+    2 => City {#15 ▼
+      #City: "АЛЕКСЕЕВКА"
+      #Region: "ЛИПЕЦКАЯ ОБЛАСТЬ"
+      #Area: "ЗАДОНСКИЙ РАЙОН"
+      #RegionIML: "ЛИПЕЦК"
+      #RateZoneMoscow: "C"
+      #RateZoneSpb: "D"
+    }
+    3 => City {#11 ▶}
+    4 => City {#12 ▶}
+  ]
+}
+```
+#Условия выдачи
+По умолчанию с любым заказом передаются все возможные условия выдачи в режиме 'Разрешено'. Так можно получить все условия:
 ```php
-$pack->setItem($item2);
-$pack->setPackageDimensions(2000,2000,2000);
+$conditionCollection = $imlClient->getConditions();
 ```
-## Расчет стоимости и создание заказа
-Добавляем грузовые места к заказу:
+Результат:
+```json
+ConditionCollection {#17 ▼
+  #type: "Condition"
+  #collection: array:15 [▼
+    0 => Condition {#29 ▼
+      -productNo: 10000
+      -allowed: true
+      -itemType: 10
+      -itemNote: null
+      -name: "Частичная выдача"
+      -statusTypeDescription: "Условие выдачи"
+      -description: "Частичная выдача"
+    }
+    1 => Condition {#26 ▼
+      -productNo: 100000
+      -allowed: true
+      -itemType: 10
+      -itemNote: null
+      -name: "Звонить в ИМ при ош.дост/перенос"
+      -statusTypeDescription: "Условие выдачи"
+      -description: "Звонить в ИМ при ош.дост/перенос"
+    }
+    2 => Condition {#15 ▶}
+    3 => Condition {#11 ▶}
+    4 => Condition {#12 ▶}
+    5 => Condition {#14 ▶}
+    6 => Condition {#25 ▶}
+    7 => Condition {#21 ▶}
+    8 => Condition {#22 ▶}
+    9 => Condition {#9 ▶}
+    10 => Condition {#8 ▶}
+    11 => Condition {#20 ▶}
+    12 => Condition {#27 ▶}
+    13 => Condition {#30 ▶}
+    14 => Condition {#13 ▶}
+  ]
+}
+```
+Запретить условие можно так:
 ```php
-$order->setPackage($pack); //$pack2,$pack3...
+$conditionCollection->first()->allowed(false);
 ```
-Создаем клиент и добавляем данные заказа:
-```php
-$client = \IMLSdk\IMLClient::instance('УНК','Пароль');
-$client->setOrder($order);
-```
-#
-Считаем и создаем заказ в IML:
-```php
-$responsePrice = $client->calculate();
-$responseOrder = $client->createOrder();
-```
+При создании заказа первое в коллекции условие выдачи будет 'Запрещено' для этого заказа
 #Доставка самовывозом до пункта выдачи заказов (ПВЗ)
-В sdk доступны четыре услуги (варианта доставки) С24, С24КО, 24, 24КО из справочника [услуг](http://api.iml.ru/list/service) (требуется авторизация).
+
 Услуги С24,С24КО подразумевают доставку отправления на ПВЗ. 
 Создание заказа на доставку на ПВЗ:
 ```php
     /**
-     * @return array|Point[]
+     * @return PointCollection
      * @throws ExceptionIMLClient
      */
 //Получаем все возможные ПВЗ
 $client->getDeliveryPoints();
 
+//Получить ПВЗ определенного региона
+$pointCollection = $imlClient->getPointsByRegionCode('ИРКУТСК');
+
 //Получаем определенную ПВЗ по коду из справочника 
-$point = $client->getPointByCode('АНАПА_ПС3');
+$pointCollection = $client->getPointByCode('АНАПА_ПС3');
 
 ```
 ***Внимание!! Услуги передаются кириллицей!***
 
 Далее просто указываем ПВЗ, в который необходимо доставить отправление:
 ```php
-$order = new \IMLSdk\Order('С24КО')//С24;
+$order = $imlClient->getOrderInstance('24КО');//С24
 $order->setPointTo($point);
 ```
 При указании ПВЗ при самовывозе регион получения указывать не обязательно:
@@ -123,7 +222,56 @@ $responsePrice = $client->calculate();
 $responseOrder = $client->createOrder();
 ```
 
-Справочник [ПВЗ](http://api.iml.ru/list/sd).
+Для расчета стоимости `$client->calculate()` и создания заказа `$client->createOrder()` необходимо создать грузовые места и товарные 
+вложения этих грузовых мест (передача пустого грузового места приведет к ошибке).
+Создаем товарное вложение с параметрами: Название, Вес, Стоимость и Наложенная стоимость (не обязательный):
+```php
+$item = new \IMLSdk\Item('Семена Цветной капусты СКАЙВОКЕР',2.3,1000,1000);
+$item2 = new \IMLSdk\Item('Петрушка', 2, 1000, 1000);
+$item3 = new \IMLSdk\Item('Редиска', 2, 1000, 1000);
+```
+Можно добавить любое свойство обьекта `Item` через сеттер, имя свойства через CamelCase. 
+
+Пример:  
+``` php 
+$item->setDiscount(10); 
+$item->setItemNote('Заметочка') 
+```
+
+Количество товарных однотипных вложений:
+```php
+$item->setItemQuantity(3);
+```
+Все товарные вложения передаются в заказ в грузовых местах.
+Грузовое место для товарных вложений:
+```php
+$pack = $imlClient->getPackageInstance();
+```
+Добавить товарное вложение, установить габариты грузового места:
+```php
+$pack->setItem($item);
+$pack->setItem($item2);
+$pack->setItem($item3);
+$pack->setPackageDimensions(2000,2000,2000);
+```
+## Расчет стоимости и создание заказа
+Добавляем грузовые места к заказу:
+```php
+$order->setPackage($pack); //$pack2,$pack3...
+```
+Добавляем данные заказа:
+```php
+$imlClient->setOrder($order);
+```
+#
+Считаем и создаем заказ в IML:
+```php
+$responsePrice = $client->calculate();
+$responseOrder = $client->createOrder();
+```
+
+
+Справочник [ПВЗ](http://list.iml.ru/sd).
 
 ####
 

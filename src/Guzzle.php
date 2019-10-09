@@ -27,19 +27,23 @@ class Guzzle implements ICurl
      * @param string $password
      * @param array $data
      * @return IMLResponse
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws ExceptionIMLClient
      */
     public function sendRequest(string $url, string $method = 'GET', string $login, string $password, array $data=[]) :IMLResponse{
-        $client = new Client(['base_uri' => $url,'exceptions' => false,'debug' => $this->debug]);
-        $responseGuzzle = $client->request($method, '', ['auth' => [$login, $password],'json'=>$data]);
-        return $this->convert($responseGuzzle);
+        try{
+            $client = new Client(['base_uri' => $url,'exceptions' => false,'debug' => $this->debug]);
+            $responseGuzzle = $client->request($method, '', ['auth' => [$login, $password],'json'=>$data]);
+            return $this->convert($responseGuzzle);
+        }catch (\Exception $e){
+            throw new ExceptionIMLClient('Ошибка отправки запроса Curl '.$e->getMessage());
+        }
     }
 
     /**
      * Активация debug режима
      * @return void
      */
-    public function debug(): void{
+    public function debugMode(): void{
         $this->debug = true;
     }
 
@@ -48,7 +52,7 @@ class Guzzle implements ICurl
      * @return IMLResponse
      */
     protected function convert(Response $response) :IMLResponse{
-        $content = (array)json_decode($response->getBody()->getContents());
+        $content = json_decode($response->getBody()->getContents(),true);
         return new IMLResponse($response->getReasonPhrase(),$response->getStatusCode(),$content);
     }
 }

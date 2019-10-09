@@ -10,7 +10,19 @@ namespace IMLSdk;
  */
 interface ICurl
 {
+    /**
+     * @param string $url
+     * @param string $method
+     * @param string $login
+     * @param string $password
+     * @param array $data
+     * @return IMLResponse
+     */
     public function sendRequest(string $url, string $method, string $login, string $password ,array $data=[]) :IMLResponse;
 
-    public function debug() :void;
+
+    /**
+     * @return void
+     */
+    public function debugMode() :void;
 }

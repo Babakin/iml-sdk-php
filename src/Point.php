@@ -4,69 +4,56 @@
 namespace IMLSdk;
 
 
-class Point
+class Point extends BaseObject
 {
-    public $ID;
-    public $CalendarWorkCode;
-    public $Code;
-    public $Name;
-    public $RequestCode;
-    public $RegionCode;
-    public $Index;
-    public $Address;
-    public $Phone;
-    public $EMail;
-    public $WorkMode;
-    public $FittingRoom;
-    public $PaymentCard;
-    public $PaymentPossible;
-    public $ReceiptOrder;
-    public $Latitude;
-    public $Longitude;
-    public $HomePage;
-    public $ClosingDate;
-    public $OpeningDate;
-    public $CouponReceipt;
-    public $DaysFreeStorage;
-    public $SubAgent;
-    public $DeliveryTimeFrom;
-    public $DeliveryTimeTo;
-    public $Carrier;
-    public $ReplicationPath;
-    public $Submission;
-    public $Special_Code;
-    public $HowToGet;
-    public $FormPostCode;
-    public $FormRegion;
-    public $FormCity;
-    public $FormStreet;
-    public $FormHouse;
-    public $FormBuilding;
-    public $FormOffice;
-    public $FormKLADRCode;
-    public $FormFIASCode;
-    public $FormalizedArea;
-    public $FormalizedLocality;
-    public $Scale;
-    public $TimeZone;
-    public $Type;
-    public $ReplacementLocation;
+    use SplitStringCamesCase;
 
-    /**
-     * @param $data
-     * @return Point
-     */
-    public static function buildPoint($data) :Point{
-        $point = new self;
-        $data = (array)$data;
-        $keys = array_keys($data);
-        foreach (get_object_vars($point) as $prop=>$val){
-            if(in_array($prop,$keys)){
-                $point->$prop = $data[$prop];
-            }
-        }
-        return $point;
-    }
+    protected $ID;
+    protected $CalendarWorkCode;
+    protected $Code;
+    protected $Name;
+    protected $RequestCode;
+    protected $RegionCode;
+    protected $Index;
+    protected $Address;
+    protected $Phone;
+    protected $EMail;
+    protected $WorkMode;
+    protected $FittingRoom;
+    protected $PaymentCard;
+    protected $PaymentPossible;
+    protected $ReceiptOrder;
+    protected $Latitude;
+    protected $Longitude;
+    protected $HomePage;
+    protected $ClosingDate;
+    protected $OpeningDate;
+    protected $CouponReceipt;
+    protected $DaysFreeStorage;
+    protected $SubAgent;
+    protected $DeliveryTimeFrom;
+    protected $DeliveryTimeTo;
+    protected $Carrier;
+    protected $ReplicationPath;
+    protected $Submission;
+    protected $Special_Code;
+    protected $HowToGet;
+    protected $FormPostCode;
+    protected $FormRegion;
+    protected $FormCity;
+    protected $FormStreet;
+    protected $FormHouse;
+    protected $FormBuilding;
+    protected $FormOffice;
+    protected $FormKLADRCode;
+    protected $FormFIASCode;
+    protected $FormalizedArea;
+    protected $FormalizedLocality;
+    protected $Scale;
+    protected $TimeZone;
+    protected $Type;
+    protected $ReplacementLocation;
+
 
     /**
      * @param $key
@@ -77,5 +64,18 @@ class Point
         if (isset($this->$key)) {
             $this->$key = $value;
         }
+    }
+
+    /**
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     * @throws ExceptionIMLClient
+     */
+    public function __call($name, $arguments){
+        $prop = $this->stringSplitCamelCase($name,'get');
+        $prop = ucfirst($prop);
+        if(!property_exists($this,$prop)) throw new ExceptionIMLClient('Неверное имя свойства');
+        return $this->$prop;
     }
 }

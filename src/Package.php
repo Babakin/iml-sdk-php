@@ -57,13 +57,10 @@ class Package
 
     /**
      * Package constructor.
-     * @param Item|null $item
      * @throws \Exception
      */
-    public function __construct(Item $item = null){
+    public function __construct(){
         $this->productNo = random_int(1111,9999);
-        if($item) $this->setItem($item);
-        return $this;
     }
 
     /**

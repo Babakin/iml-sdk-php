@@ -10,7 +10,7 @@ use function GuzzleHttp\Psr7\str;
  * Class Condition
  * @package IMLSdk
  */
-class Condition
+class Condition extends BaseObject
 {
     use ObjectToArrayTrait;
 
@@ -28,7 +28,7 @@ class Condition
      * Если указано значение 0 – запрещено.
      * @var bool
      */
-    private $allowed;
+    private $allowed = 1;
 
     /**
      * Для определения условий выдачи всегда заполнять значением ‘10’.
@@ -62,16 +62,16 @@ class Condition
 
     /**
      * Создание обьекта по параметрам, полученным из api IML
-     * @param object $data
+     * @param array $data
      * @return Condition
      */
-    public static function buildCondition(\stdClass $data) :Condition{
-        $condition = new self;
-        $condition->productNo = $data->Code;
-        $condition->allowed = false;
-        $condition->name = $data->Name;
-        $condition->statusTypeDescription = $data->StatusTypeDescription;
-        $condition->description = $data->Description;
+    public function init(array $data) :BaseObject{
+        $condition = new static();
+        $condition->productNo = $data['Code'];
+        $condition->allowed = true;
+        $condition->name = $data['Name'];
+        $condition->statusTypeDescription = $data['StatusTypeDescription'];
+        $condition->description = $data['Description'];
         return $condition;
     }
 
@@ -80,8 +80,18 @@ class Condition
      * @param string $note
      * @return $this
      */
-    public function setItemNote(string $note){
+    public function setItemNote(string $note) :Condition{
         $this->itemNote = $note;
+        return $this;
+    }
+
+
+    /**
+     * @param bool $allowed
+     * @return $this
+     */
+    public function allowed(bool $allowed){
+        $this->allowed = (int) $allowed;
         return $this;
     }
 }

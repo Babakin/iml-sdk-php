@@ -12,8 +12,13 @@ interface ICurlInject
 {
     /**
      * @param ICurl $curl
-     * @param bool $debug
-     * @return mixed
+     * @return void
      */
-    public function setCurl(ICurl $curl,bool $debug);
+    public function injectCurl(ICurl $curl) :void;
+
+    /**
+     * @param bool $debug
+     * @return void
+     */
+    public function curlDebugMode(bool $debug) :void;
 }

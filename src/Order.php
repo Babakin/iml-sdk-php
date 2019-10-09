@@ -10,116 +10,117 @@ namespace IMLSdk;
 class Order
 {
     use ObjectToArrayTrait;
+    use SplitStringCamesCase;
 
     /**
      * Job – услуга, Code из справочника услуг, находится по адресу http://list.iml.ru/service
      * @var string
      */
-    public $job;
+    protected $job;
 
     /**
      * Номер заказа, любая строка, если не указан, передается случайное число
      * @var string
      */
-    public $customerOrder;
+    protected $customerOrder;
 
     /**
      * Вес(кг) Дробное число, указывается с разделетилем целой и дробной части - точкой.
      * @var float
      */
-    public $weight;
+    protected $weight;
 
     /**
      * Кол-во мест в заказе, от 1 до 9
      * @var integer
      */
-    public $volume = 0;
+    protected $volume = 0;
 
     /**
      * Тестовый режим, 'true' для тестового режима
      * @var bool
      */
-    public $test = false;
+    protected $test = false;
 
     /**
      * Стоимость ТМЦ
      * @var float
      */
-    public $amount = 0;
+    protected $amount = 0;
 
     /**
      * Наложенная стоимость
      * @var float
      */
-    public $valuatedAmount = 0;
+    protected $valuatedAmount = 0;
 
     /**
      * Регион отправления. Code из таблицы регионов, находится по адресу http://list.iml.ru/region
      * @var string
      */
-    public $regionCodeFrom;
+    protected $regionCodeFrom;
 
     /**
      * Регион получения. Code из таблицы регионов, находится по адресу http://list.iml.ru/region
      * @var string
      */
-    public $regionCodeTo;
+    protected $regionCodeTo;
 
     /**
      * Индекс региона отправления, альтернатива RegionCodeTo
      * @var integer
      */
-    public $indexFrom;
+    protected $indexFrom;
 
     /**
      * Индекс региона получения, альтернатива RegionCodeTo
      * @var integer
      */
-    public $indexTo;
+    protected $indexTo;
 
     /**
      * RequestCode из таблицы пунктов самовывоза
      * @var string
      */
-    public $deliveryPoint;
+    protected $deliveryPoint;
 
-    public $address;
+    protected $address;
 
     /**
      * Уникальный номер пункта самовывоза, Code из таблицы пунктов самовывоза, альтернатива DeliveryPoint
      * @var string
      */
-    public $DeliveryPointCode;
+    protected $DeliveryPointCode;
 
     /**
      * Электронный адрес получателя заказа
      * @var string
      */
-    public $email;
+    protected $email;
 
     /**
      * Телефон
      * @var string
      */
-    public $phone;
+    protected $phone;
 
     /**
      * Контактное лицо
      * @var string
      */
-    public $contact;
+    protected $contact;
 
     /**
      * Комментарий к заказу
      * @var string
      */
-    public $comment;
+    protected $comment;
 
     /**
      * Позиции заказа, если указывались при создании заказа
      * @var Item[]
      */
-    public $goodItems = [];
+    protected $goodItems = [];
 
     /**
      * Возможные услуги для использования
@@ -147,20 +148,17 @@ class Order
     const DELIVERY_CASH_SERVICE = '24КО';
 
 
-
     /**
-     * Order constructor.
      * @param string $job
-     * @param float $weight
-     * @param float $amount
-     * @param float $valuatedAmount
      * @throws ExceptionIMLClient
+     * @return self
      */
-    public function __construct(string $job){
+    public function create(string $job) :Order {
         if(!in_array($job, self::SERVICES)){
             throw new ExceptionIMLClient('Услуги '.$job.' не существует, возможные услуги '.implode(',',self::SERVICES));
         }
         $this->job = $job;
+        return $this;
     }
 
     /**
@@ -325,10 +323,10 @@ class Order
      * @return $this
      */
     public function setPointTo(Point $pointTo){
-        $this->setDeliveryPointCode($pointTo->Code);
-        $this->setAddressDelivery($pointTo->Address);
-        $this->regionTo($pointTo->RegionCode);
-        $this->setDeliveryPoint($pointTo->RequestCode);
+        $this->setDeliveryPointCode($pointTo->getCode());
+        $this->setAddressDelivery($pointTo->getAddress());
+        $this->regionTo($pointTo->getRegionCode());
+        $this->setDeliveryPoint($pointTo->getRequestCode());
         return $this;
     }
 
@@ -356,6 +354,12 @@ class Order
         }
     }
 
+    public function addConditions(ConditionCollection $conditions) :void {
+        foreach ($conditions as $condition){
+            $this->goodItems = array_merge($this->goodItems,[$condition->toArray()]);
+        }
+    }
+
     /**
      * @param Item $item
      */
@@ -378,5 +382,17 @@ class Order
     public function setDeliveryPointCode(string $Code){
         $this->DeliveryPointCode = $Code;
         return $this;
+    }
+
+    /**
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     * @throws ExceptionIMLClient
+     */
+    public function __call($name, $arguments){
+        $prop = $this->stringSplitCamelCase($name,'get');
+        if(!property_exists($this,$prop)) throw new ExceptionIMLClient('Неверное имя свойства');
+        return $this->$prop;
     }
 }

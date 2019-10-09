@@ -17,13 +17,13 @@ class IMLClient implements ICurlInject
      * Пароль аккаунта IML
      * @var string
      */
-    public $login;
+    private $login;
 
     /**
      * Логин аккаунта IML
      * @var string
      */
-    public $password;
+    private $password;
 
     /**
      * URL запроса, тестовый и боевой
@@ -35,38 +35,44 @@ class IMLClient implements ICurlInject
      * Флаг тестового режима, когда активен, все запросы идут на тестовый сервер
      * @var bool
      */
-    public $isTestMode = false;
+    private $isTestMode = false;
 
     /**
      * Флаг авторизации пользователя в IML, по умолчанию не авторизован
      * @var bool
      */
-    public $unauthorized = true;
+    private $unauthorized = true;
 
     /**
      * @var ICurl
      */
-    public $curl;
+    private $curl;
 
-    /**
-     * @var Container
-     */
-    public $container;
 
     /**
      * @var Order
      */
-    public $order;
+    private $order;
 
     /**
-     * @var Point[]
+     * @var PointCollection
      */
-    public $points;
+    private $points;
 
     /**
-     * @var Condition[]
+     * @var ConditionCollection
      */
-    public $conditions;
+    private $conditions;
+
+    /**
+     * @var CityCollection
+     */
+    private $cities;
+
+    /**
+     * @var Factory
+     */
+    private $factory;
 
     /**
      * URL IML
@@ -78,62 +84,63 @@ class IMLClient implements ICurlInject
      */
     const BASE_URI_TEST = 'http://api-test.iml.ru';
 
+    const BASE_URI_LIST = 'http://list.iml.ru';
+
     /**
      * IMLClient constructor.
-     * @param integer $login
-     * @param string $password
-     * @param Container $container
-     * @param bool $test
-     * @param bool $curlDebug
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @param Factory $factory
+     * @throws ExceptionIMLClient
      */
-    public function __construct(string $login, string $password, Container $container, bool $test=false,$curlDebug = false){
-        $this->testMode($test);
-        $this->login = $login;
-        $this->password = $password;
-        $this->container = $container;
-        $this->setCurl($this->container->getCurl(),$curlDebug);
-        $this->auth();
+    public function __construct(Factory $factory){
+        $this->factory = $factory;
+        $this->curl = $this->factory->getCurl();
+        $this->points = $this->factory->getCollection('Point');
+        $this->conditions = $this->factory->getCollection('Condition');
+        $this->cities = $this->factory->getCollection('City');
+        $this->baseUriActive = IMLClient::BASE_URI;
     }
 
     /**
-     * Инициализация клиента
+     * Режим отладки, служебная информация о запросе будет выведена на экран
+     * @param bool $debug
+     */
+    public function curlDebugMode(bool $debug): void{
+        if($debug) $this->curl->debug();
+        return;
+    }
+
+    /**
+     * Проверка логина и пароля в службе IML
      * @param string $login
      * @param string $password
-     * @param bool $test
-     * @param bool $curlDebug
-     * @return IMLClient
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @return $this
+     * @throws ExceptionIMLClient
      */
-    public static function instance(string $login, string $password, bool $test = false,$curlDebug = false){
-        return new static($login,$password, new Container(), $test,$curlDebug);
+    public function logIn(string $login, string $password){
+        $this->login = $login;
+        $this->password = $password;
+        $this->checkAuth();
+        return $this;
     }
+
 
     /**
      * DI Curl implements
      * @param ICurl $curl
-     * @param bool $debug
      * @return mixed|void
      */
-    public function setCurl(ICurl $curl,bool $debug = false){
+    public function injectCurl(ICurl $curl) :void {
         $this->curl = $curl;
-        if($debug) $this->curl->debug();
+        return;
     }
 
     /**
      * Активация тестового режима
-     * @param bool $active
      * @return $this
      */
-    private function testMode($active){
-
-        if($active){
-            $this->isTestMode = $active;
-            $this->baseUriActive = IMLClient::BASE_URI_TEST;
-        }else{
-            $this->isTestMode = $active;
-            $this->baseUriActive = IMLClient::BASE_URI;
-        }
+    public function testMode() :IMLClient{
+        $this->isTestMode = true;
+        $this->baseUriActive = IMLClient::BASE_URI_TEST;
         return $this;
     }
 
@@ -142,11 +149,19 @@ class IMLClient implements ICurlInject
      * @param string $uri
      * @param string $method
      * @param array $data
-     * @return mixed|\Psr\Http\Message\ResponseInterface
+     * @param bool $listUri используется для получения данных из IML list
+     * @return IMLResponse
      * @throws ExceptionIMLClient
      */
-    public function request(string $uri, string $method = 'GET',array $data=[]) :IMLResponse{
+    public function request(string $uri, string $method = 'GET',array $data=[],$listUri = false) :IMLResponse{
+        if(!$this->curl) throw new ExceptionIMLClient('Object ICUrl not found, use injectCurl method for injection');
+        if(!$this->login or !$this->password ) throw new ExceptionIMLClient('Логин или пароль отсутствуют, используйте метод logIn');
+        if($this->unauthorized) throw new ExceptionIMLClient('Нет авторизации');
+
         try{
+            if($listUri){
+                return $this->curl->sendRequest(self::BASE_URI_LIST .'/'.$uri, $method, $this->login, $this->password, $data);
+            }
             return $this->curl->sendRequest($this->baseUriActive.'/'.$uri, $method, $this->login, $this->password, $data);
         }catch (\Exception $exception){
             throw new ExceptionIMLClient('Ошибка запроса Curl');
@@ -158,9 +173,9 @@ class IMLClient implements ICurlInject
      * @return $this
      * @throws ExceptionIMLClient
      */
-    public function auth(){
+    private function checkAuth(){
         if($this->unauthorized){
-            $response = $this->request('v5/GetPrice','POST', ['weigth'=>2.3]);
+            $response = $this->curl->sendRequest($this->baseUriActive.'/'.'v5/GetPrice', 'POST', $this->login, $this->password, ['weigth'=>2.3]);
             if($response->getStatusCode() !== 401 && $response->getStatusCode() !== 500){
                 $this->unauthorized = false;
             }
@@ -180,6 +195,18 @@ class IMLClient implements ICurlInject
         }
     }
 
+
+    /**
+     * @param string $job
+     * @return Order
+     * @throws ExceptionIMLClient
+     */
+    public function getOrderInstance(string $job=null) :Order{
+        $order = $this->factory->getOrder();
+        if ($job) return $order->create($job);
+        return $order;
+    }
+
     /**
      * @param Order $order
      * @throws ExceptionIMLClient
@@ -192,12 +219,32 @@ class IMLClient implements ICurlInject
     }
 
     /**
+     * @return Package
+     * @throws \Exception
+     */
+    public function getPackageInstance(){
+        return $this->factory->getPackage();
+    }
+
+    /**
      * @return $this
      * @throws ExceptionIMLClient
      */
     private function checkOrder(){
         if(is_null($this->order)) throw new ExceptionIMLClient('Нет исходных данных');
+        if(empty($this->order->getGoodItems())) throw new ExceptionIMLClient('В заказе нет ниодного грузового места');
         return $this;
+    }
+
+    /**
+     * @param string $productName
+     * @param float $weightLine
+     * @param float $amountLine
+     * @param float|null $statisticalValueLine
+     * @return Item
+     */
+    public function getItem(string $productName,float $weightLine,float $amountLine, float $statisticalValueLine=null):Item{
+        return $this->factory->getItem()->create($productName, $weightLine, $amountLine, $statisticalValueLine);
     }
 
 
@@ -216,7 +263,7 @@ class IMLClient implements ICurlInject
      * @throws ExceptionIMLClient
      */
     public function createOrder():IMLResponse{
-        if(!$this->order->customerOrder) $this->order->setCustomerOrder(rand ( 10000 , 99999 ));
+        if(!$this->order->getCustomerOrder()) $this->order->setCustomerOrder(rand ( 10000 , 99999 ));
         return $this->sendOrder('/Json/CreateOrder');
     }
 
@@ -228,17 +275,15 @@ class IMLClient implements ICurlInject
     private function sendOrder(string $uri):IMLResponse{
         $this->checkOrder();
         $this->getConditions();
-        $this->prepareConditions();
+//        $this->addConditions();
         return $this->request($uri,'POST',$this->order->toArray());
     }
 
     /**
      * Собираем условия выдачи в Order
      */
-    private function prepareConditions(){
-        foreach ($this->conditions as $condition){
-            $this->order->goodItems = array_merge($this->order->goodItems,[$condition->toArray()]);
-        }
+    private function addConditions():void {
+        $this->order->addConditions($this->conditions);
         return;
     }
 
@@ -250,46 +295,98 @@ class IMLClient implements ICurlInject
     public function getPointByCode(string $Code) :?Point{
         $points = $this->getDeliveryPoints();
         foreach ($points as $point){
-            if($point->Code == $Code) return $point;
+            if($point->getCode() == $Code) return $point;
         }
         return null;
     }
 
     /**
-     * @return array|Point[]
+     * @param string $code
+     * @return PointCollection
      * @throws ExceptionIMLClient
      */
-    public function getDeliveryPoints(){
-        if(!$this->points){
-            $response =  $this->request('list/sd');
-            $points = [];
-            foreach ($response->getContent() as $point){
-                $points[] = $this->container->getPoint($point);
-            }
-            $this->points =  $points;
+    public function getPointsByRegionCode(string $code) :PointCollection{
+        $response =  $this->request('sd?RegionCode='.$code,'GET',[],true);
+        return $this->buildCollection($response->getContent(),'Point');
+    }
+
+    /**
+     * @return PointCollection
+     * @throws ExceptionIMLClient
+     */
+    public function getDeliveryPoints():PointCollection{
+        if($this->points->isEmpty()){
+            $response =  $this->request('sd','GET',[],true);
+            $this->points = $this->buildCollection($response->getContent(),'Point');
         }
         return $this->points;
     }
 
     /**
-     * @return $this
+     * @return ConditionCollection
      * @throws ExceptionIMLClient
      */
     public function getConditions(){
-        if(!$this->conditions){
+        if($this->conditions->isEmpty()){
             try{
-                $response = $this->curl->sendRequest('http://list.iml.ru/Status?type=json', 'GET', $this->login, $this->password);
-            }catch (\Exception $exception){
+                $response = $this->request('Status?type=json', 'GET', [], true);
+                $data = [];
+                foreach ($response->getContent() as $key=>$condition){
+                    if($condition['StatusType'] === 40 && $condition['Code'] !== 13000){
+                        $data[] = $condition;
+                    }
+                }
+                $this->conditions = $this->buildCollection($data,'Condition');
+            }catch (\Exception $e){
+                if($e instanceof ExceptionIMLClient) throw $e;
                 throw new ExceptionIMLClient('Ошибка запроса к http://list.iml.ru/Status?type=json');
             }
-            $conditions = [];
-            foreach ($response->getContent() as $condition){
-                if($condition->StatusType == 40 && $condition->Code !== 13000){
-                    $conditions[] = $this->container->getCondition($condition);
-                }
-            }
-            $this->conditions =  $conditions;
         }
-        return $this;
+        return $this->conditions;
+    }
+
+
+    /**
+     * Вернет города или несколько к которым принадлежит город,
+     * В полученном объекте поле RegionIML
+     * @param string $city
+     * @return Collection
+     * @throws ExceptionIMLClient
+     */
+    public function getRegionByCity(string $city){
+        $response = $this->request('RegionCity?type=json', 'GET', [], true);
+        $shortest = 2;
+        $result = [];
+        $accurateResult = [];
+        foreach ($response->getContent() as $reg){
+            $lev = levenshtein(mb_strtolower($city), mb_strtolower($reg['City']));
+            if ($lev == 0) {
+                $accurateResult[] = $reg;
+            }
+
+            if ($lev <= $shortest ) {
+                $result[] = $reg;
+            }
+        }
+        if(count($accurateResult)>0){
+            return $this->buildCollection($accurateResult,'City');
+        }
+        return $this->buildCollection($result,'City');
+    }
+
+
+    /**
+     * @param array $data
+     * @param string $type
+     * @return Collection
+     * @throws ExceptionIMLClient
+     */
+    private function buildCollection(array $data,string $type){
+        $collection = $this->factory->getCollection($type);
+        $factoryMethod = 'get'.$type;
+        foreach ($data as $cities){
+            $collection->add($this->factory->$factoryMethod()->init($cities));
+        }
+        return $collection;
     }
 }

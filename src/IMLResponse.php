@@ -28,7 +28,7 @@ class IMLResponse
      * @param int $statusCode
      * @param array $content
      */
-    public function __construct(string $title, int $statusCode, array $content){
+    public function __construct(string $title, int $statusCode, array $content=null){
         $this->title = $title;
         $this->content = $content;
         $this->statusCode = $statusCode;

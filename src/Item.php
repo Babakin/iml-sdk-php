@@ -7,18 +7,19 @@ namespace IMLSdk;
 class Item
 {
     use ObjectToArrayTrait;
+    use SplitStringCamesCase;
 
     /**
      * Наименование позиции
      * @var string
      */
-    private $productName;
+    protected $productName;
 
     /**
      * Вес вложения
      * @var float
      */
-    private $weightLine;
+    protected $weightLine;
 
     /**
      * Стоимость передаваемого вложения за единицу,
@@ -26,7 +27,7 @@ class Item
      * включая НДС, с учетом всех скидок и надбавок.
      * @var float
      */
-    private $amountLine;
+    protected $amountLine;
 
     /**
      * Оценочная стоимость.
@@ -35,19 +36,19 @@ class Item
      * если Принципал выбрал варианты отчетов с подробностями.
      * @var float
      */
-    private $statisticalValueLine;
+    protected $statisticalValueLine;
 
     /**
      * Номер вложения (артикул).
      * @var string
      */
-    private $productNo;
+    protected $productNo;
 
     /**
      * Вариант вложения (размер, цвет и т.д.)
      * @var string
      */
-    private $productVariant;
+    protected $productVariant;
 
     /**
      * Штрих код вложения. Вложения в заказ должны быть промаркированы этикетками,
@@ -62,21 +63,21 @@ class Item
      * Исключение: если отправитель заблокировал услугу частичной выдачи или не использует услугу комплектации заказа.
      * @var string
      */
-    private $productBarCode;
+    protected $productBarCode;
 
     /**
      * Размер уже применённой к товару скидки.
      * Используется если Получателю необходимо передать размер скидки в фискальном чеке.
      * @var float
      */
-    private $discount;
+    protected $discount;
 
     /**
      * Кол-во одинаковых вложений.
      * По умолчанию ставится значение = 1.
      * @var int
      */
-    private $itemQuantity = 1;
+    protected $itemQuantity = 1;
 
     /**
      * Запрет отказа от вложения при частичной выдаче заказа.
@@ -84,19 +85,19 @@ class Item
      * позиции при частичной выдаче, то заполнить значением 1.
      * @var bool
      */
-    private $deliveryService;
+    protected $deliveryService;
 
     /**
      * Служебное поле. Означает тип подробности - товарное вложение.
      * @var int
      */
-    private $itemType = 0;
+    protected $itemType = 0;
 
     /**
      * Дополнительная информация, которую нужно принять к сведенью при выполнении услуги.
      * @var string
      */
-    private $itemNote;
+    protected $itemNote;
 
 
     /**
@@ -105,6 +106,7 @@ class Item
      * @param float $weightLine
      * @param float $amountLine
      * @param float $statisticalValueLine
+     * @return Item
      */
     public function __construct(string $productName,float $weightLine,float $amountLine, float $statisticalValueLine=null){
         $this->productName = $productName;
@@ -113,6 +115,7 @@ class Item
         $this->statisticalValueLine = $statisticalValueLine;
         $this->productNo = rand (10000, 99999);
         $this->productBarCode = rand (10000000, 99999999);
+        return $this;
     }
 
     /**
@@ -125,13 +128,8 @@ class Item
      */
     public function __call($method, $args) {
         if (count($args)>1) throw new ExceptionIMLClient('Неверные параметры для свойства');
-        $arr = preg_split('/(?=[A-Z])/',$method);
-        if($arr[0] == 'set'){
-            unset($arr[0]);
-            $prop = lcfirst(implode ($arr));
-        }
+        $prop = $this->stringSplitCamelCase($method,'set');
         if(!property_exists($this,$prop)) throw new ExceptionIMLClient('Неверное имя свойства');
-
         $this->$prop = $args[0];
         return $this;
     }
