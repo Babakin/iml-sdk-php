@@ -4,6 +4,7 @@ namespace IMLSdk;
 
 use IMLSdk\Guzzle;
 use GuzzleHttp\Client;
+use IMLSdk\Filters\LocationFilter;
 
 /**
  * Class IMLClient
@@ -153,13 +154,24 @@ class IMLClient implements ICurlInject
      * @return IMLResponse
      * @throws ExceptionIMLClient
      */
-    public function request(string $uri, string $method = 'GET',array $data=[],$listUri = false) :IMLResponse{
-        if(!$this->curl) throw new ExceptionIMLClient('Object ICUrl not found, use injectCurl method for injection');
-        if(!$this->login or !$this->password ) throw new ExceptionIMLClient('Логин или пароль отсутствуют, используйте метод logIn');
-        if($this->unauthorized) throw new ExceptionIMLClient('Нет авторизации');
+    public function request(string $uri, string $method = 'GET',array $data=[],$listUri = false) :IMLResponse
+    {
+        if(!$this->curl) 
+        {
+            throw new ExceptionIMLClient('Object ICUrl not found, use injectCurl method for injection');
+        }
+        if(!$this->login or !$this->password ) 
+        {
+            throw new ExceptionIMLClient('Логин или пароль отсутствуют, используйте метод logIn');
+        }
+        if($this->unauthorized) 
+        {
+            throw new ExceptionIMLClient('Нет авторизации');
+        }
 
         try{
-            if($listUri){
+            if($listUri)
+            {
                 return $this->curl->sendRequest(self::BASE_URI_LIST .'/'.$uri, $method, $this->login, $this->password, $data);
             }
             return $this->curl->sendRequest($this->baseUriActive.'/'.$uri, $method, $this->login, $this->password, $data);
@@ -167,7 +179,30 @@ class IMLClient implements ICurlInject
             throw new ExceptionIMLClient('Ошибка запроса Curl');
         }
     }
+    
+    /*
+     * Запрос к IML
+     * @param string $uri
+     * @param string $method
+     * @param array $data
+     * @param bool $listUri используется для получения данных из IML list
+     * @return IMLResponse
+     * @throws ExceptionIMLClient
+     */
+    private function requestListData(string $uri, string $method = 'GET',array $data=[]) :IMLResponse
+    {
+        if(!$this->curl) 
+        {
+            throw new ExceptionIMLClient('Object ICUrl not found, use injectCurl method for injection');
+        }
 
+        try{
+            return $this->curl->sendNonAuthRequest(self::BASE_URI_LIST .'/'.$uri, $method, $data);
+        }catch (\Exception $exception){
+            throw new ExceptionIMLClient('Ошибка запроса Curl');
+        }
+
+    }
     /**
      * Проверка прользователя в системе IML
      * @return $this
@@ -343,6 +378,21 @@ class IMLClient implements ICurlInject
             }
         }
         return $this->conditions;
+    }
+
+
+    public function getLocationCollection()
+    {
+        $response = $this->requestListData('Location?type=json');
+        $resultData = (new LocationFilter($response->getContent()))->filterCollection();        
+        return $this->buildCollection($resultData,'Location');
+    }
+
+
+    public function getRegionCityCollection()
+    {
+        $response = $this->requestListData('RegionCity?type=json');
+        return $this->buildCollection($response->getContent(),'City');
     }
 
 
