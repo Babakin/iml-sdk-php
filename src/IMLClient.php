@@ -5,6 +5,7 @@ namespace IMLSdk;
 use IMLSdk\Guzzle;
 use GuzzleHttp\Client;
 use IMLSdk\Filters\LocationFilter;
+use IMLSdk\Filters\PickPointsFilter;
 
 /**
  * Class IMLClient
@@ -345,17 +346,38 @@ class IMLClient implements ICurlInject
         return $this->buildCollection($response->getContent(),'Point');
     }
 
+
+
+
+
+
     /**
      * @return PointCollection
      * @throws ExceptionIMLClient
      */
-    public function getDeliveryPoints():PointCollection{
-        if($this->points->isEmpty()){
-            $response =  $this->request('sd','GET',[],true);
-            $this->points = $this->buildCollection($response->getContent(),'Point');
-        }
-        return $this->points;
+    public function getDeliveryPointsCollection($sdType = null, $RegionCode =  null):PointCollection{
+
+            $params = [];
+            if($sdType)
+            {
+                $params[$$sdType] = $sdType;
+            }
+            
+            if($RegionCode)
+            {
+                $params[$$RegionCode] = $RegionCode;
+            }
+            
+            $paramsStr = implode("&", $params);
+            $requestStr = ($paramsStr) ? 'sd?'.$paramsStr : 'sd';
+            $response =  $this->requestListData($requestStr,'GET',[]);
+            // фильтруем некорректные пвз
+            $resultData = (new PickPointsFilter($response->getContent()))->filterCollection();        
+            return $this->buildCollection($resultData, 'Point');
     }
+    
+    
+    
 
     /**
      * @return ConditionCollection
@@ -364,7 +386,7 @@ class IMLClient implements ICurlInject
     public function getConditions(){
         if($this->conditions->isEmpty()){
             try{
-                $response = $this->request('Status?type=json', 'GET', [], true);
+                $response = $this->requestListData('Status?type=json', 'GET', []);
                 $data = [];
                 foreach ($response->getContent() as $key=>$condition){
                     if($condition['StatusType'] === 40 && $condition['Code'] !== 13000){
@@ -403,8 +425,10 @@ class IMLClient implements ICurlInject
      * @return Collection
      * @throws ExceptionIMLClient
      */
+    
+    
     public function getRegionByCity(string $city){
-        $response = $this->request('RegionCity?type=json', 'GET', [], true);
+        $response = $this->requestListData('RegionCity?type=json', 'GET', []);
         $shortest = 2;
         $result = [];
         $accurateResult = [];
