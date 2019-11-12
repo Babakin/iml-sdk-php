@@ -25,6 +25,19 @@ class PointCollection extends Collection
 	// }
 	
 	
+	public function findByID($ID)
+	{
+		foreach ($this as $key => $item)
+		{
+			if($item->getID() == $ID)
+			{
+				return $item;
+			}
+		}
+		return false;
+	}
+	
+	
 	private function hasCashService($item)
 	{
 		return $item['PaymentPossible'] == 1;

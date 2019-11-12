@@ -433,7 +433,7 @@ class IMLClient implements ICurlInject
         $result = [];
         $accurateResult = [];
         foreach ($response->getContent() as $reg){
-            $lev = levenshtein(mb_strtolower($city), mb_strtolower($reg['City']));
+            $levCity = levenshtein(mb_strtolower($city), mb_strtolower($reg['City']));
             if ($lev == 0) {
                 $accurateResult[] = $reg;
             }
@@ -447,6 +447,42 @@ class IMLClient implements ICurlInject
         }
         return $this->buildCollection($result,'City');
     }
+    
+    
+    
+    private function clearPlaceName($placeName)
+    {
+         $placeName = str_ireplace(['Г.', 'город'], '', $placeName);   
+         $placeName = str_ireplace ( ['РЕСП.', 'КРАЙ.', 'ОБЛ.'], ['РЕСПУБЛИКА', 'КРАЙ', 'ОБЛАСТЬ'], $placeName);
+         $placeName = trim(mb_strtoupper(str_ireplace('ё', 'е', $placeName)));
+         return $placeName;
+    }
+
+    
+    public function getRegionByCityRegion(string $city, string $region){
+        $response = $this->requestListData('RegionCity?type=json', 'GET', []);
+        $shortest = 2;
+        $result = [];
+        $accurateResult = [];
+        
+        foreach ($response->getContent() as $reg){
+            
+            
+            $levCity = levenshtein($this->clearPlaceName($city), $this->clearPlaceName($reg['City']));
+            $levRegion = levenshtein($this->clearPlaceName($region), $this->clearPlaceName($reg['Region']));
+            if ($levCity == 0 && $levRegion == 0) {
+                $accurateResult[] = $reg;
+            }
+
+            if ($levCity <= $shortest && $levRegion <= $shortest) {
+                $result[] = $reg;
+            }
+        }
+        if(count($accurateResult)>0){
+            return $this->buildCollection($accurateResult,'City');
+        }
+        return $this->buildCollection($result,'City');
+    }    
 
 
     /**
