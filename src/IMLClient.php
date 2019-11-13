@@ -107,7 +107,7 @@ class IMLClient implements ICurlInject
      * @param bool $debug
      */
     public function curlDebugMode(bool $debug): void{
-        if($debug) $this->curl->debug();
+        if($debug) $this->curl->debugMode();
         return;
     }
 

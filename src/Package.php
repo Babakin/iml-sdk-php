@@ -134,7 +134,7 @@ class Package
     }
     
     
-    private function setWeightLine(float $weightLine){
+    public function setWeightLine(float $weightLine){
         $this->weightLine = $weightLine;
     }    
     
