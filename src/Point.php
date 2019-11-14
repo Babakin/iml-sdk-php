@@ -78,4 +78,29 @@ class Point extends BaseObject
         if(!property_exists($this,$prop)) throw new ExceptionIMLClient('Неверное имя свойства');
         return $this->$prop;
     }
+    
+    
+    public function getFormAddress()
+    {
+        $params = [
+        'FormRegion',
+        'FormalizedLocality',
+        'FormalizedArea',
+        'FormCity',
+        'FormStreet',
+        'FormHouse',
+        'FormBuilding',
+        'FormOffice'];
+        
+        $formatAr = [];
+        foreach ($params as $param) {
+            if($this->$param)
+            {
+                $formatAr[] = $this->$param;    
+            }
+        }
+    
+    
+        return implode(', ', $formatAr);
+    }
 }

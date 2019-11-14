@@ -132,4 +132,10 @@ class Package
     public function getWeightLine(){
         return $this->weightLine;
     }
+    
+    
+    public function setWeightLine(float $weightLine){
+        $this->weightLine = $weightLine;
+    }    
+    
 }

@@ -39,6 +39,15 @@ class Factory
         return new City;
     }
 
+
+    /**
+     * @return Location
+     */
+    public function getLocation() :Location{
+        return new Location;
+    }
+
+
     /**
      * @param string $type
      * @return Collection

@@ -4,6 +4,8 @@ namespace IMLSdk;
 
 use IMLSdk\Guzzle;
 use GuzzleHttp\Client;
+use IMLSdk\Filters\LocationFilter;
+use IMLSdk\Filters\PickPointsFilter;
 
 /**
  * Class IMLClient
@@ -105,7 +107,7 @@ class IMLClient implements ICurlInject
      * @param bool $debug
      */
     public function curlDebugMode(bool $debug): void{
-        if($debug) $this->curl->debug();
+        if($debug) $this->curl->debugMode();
         return;
     }
 
@@ -153,13 +155,24 @@ class IMLClient implements ICurlInject
      * @return IMLResponse
      * @throws ExceptionIMLClient
      */
-    public function request(string $uri, string $method = 'GET',array $data=[],$listUri = false) :IMLResponse{
-        if(!$this->curl) throw new ExceptionIMLClient('Object ICUrl not found, use injectCurl method for injection');
-        if(!$this->login or !$this->password ) throw new ExceptionIMLClient('Логин или пароль отсутствуют, используйте метод logIn');
-        if($this->unauthorized) throw new ExceptionIMLClient('Нет авторизации');
+    public function request(string $uri, string $method = 'GET',array $data=[],$listUri = false) :IMLResponse
+    {
+        if(!$this->curl) 
+        {
+            throw new ExceptionIMLClient('Object ICUrl not found, use injectCurl method for injection');
+        }
+        if(!$this->login or !$this->password ) 
+        {
+            throw new ExceptionIMLClient('Логин или пароль отсутствуют, используйте метод logIn');
+        }
+        if($this->unauthorized) 
+        {
+            throw new ExceptionIMLClient('Нет авторизации');
+        }
 
         try{
-            if($listUri){
+            if($listUri)
+            {
                 return $this->curl->sendRequest(self::BASE_URI_LIST .'/'.$uri, $method, $this->login, $this->password, $data);
             }
             return $this->curl->sendRequest($this->baseUriActive.'/'.$uri, $method, $this->login, $this->password, $data);
@@ -167,7 +180,30 @@ class IMLClient implements ICurlInject
             throw new ExceptionIMLClient('Ошибка запроса Curl');
         }
     }
+    
+    /*
+     * Запрос к IML
+     * @param string $uri
+     * @param string $method
+     * @param array $data
+     * @param bool $listUri используется для получения данных из IML list
+     * @return IMLResponse
+     * @throws ExceptionIMLClient
+     */
+    private function requestListData(string $uri, string $method = 'GET',array $data=[]) :IMLResponse
+    {
+        if(!$this->curl) 
+        {
+            throw new ExceptionIMLClient('Object ICUrl not found, use injectCurl method for injection');
+        }
 
+        try{
+            return $this->curl->sendNonAuthRequest(self::BASE_URI_LIST .'/'.$uri, $method, $data);
+        }catch (\Exception $exception){
+            throw new ExceptionIMLClient('Ошибка запроса Curl');
+        }
+
+    }
     /**
      * Проверка прользователя в системе IML
      * @return $this
@@ -310,17 +346,38 @@ class IMLClient implements ICurlInject
         return $this->buildCollection($response->getContent(),'Point');
     }
 
+
+
+
+
+
     /**
      * @return PointCollection
      * @throws ExceptionIMLClient
      */
-    public function getDeliveryPoints():PointCollection{
-        if($this->points->isEmpty()){
-            $response =  $this->request('sd','GET',[],true);
-            $this->points = $this->buildCollection($response->getContent(),'Point');
-        }
-        return $this->points;
+    public function getDeliveryPointsCollection($sdType = null, $RegionCode =  null):PointCollection{
+
+            $params = [];
+            if($sdType)
+            {
+                $params[$$sdType] = $sdType;
+            }
+            
+            if($RegionCode)
+            {
+                $params[$$RegionCode] = $RegionCode;
+            }
+            
+            $paramsStr = implode("&", $params);
+            $requestStr = ($paramsStr) ? 'sd?'.$paramsStr : 'sd';
+            $response =  $this->requestListData($requestStr,'GET',[]);
+            // фильтруем некорректные пвз
+            $resultData = (new PickPointsFilter($response->getContent()))->filterCollection();        
+            return $this->buildCollection($resultData, 'Point');
     }
+    
+    
+    
 
     /**
      * @return ConditionCollection
@@ -329,7 +386,7 @@ class IMLClient implements ICurlInject
     public function getConditions(){
         if($this->conditions->isEmpty()){
             try{
-                $response = $this->request('Status?type=json', 'GET', [], true);
+                $response = $this->requestListData('Status?type=json', 'GET', []);
                 $data = [];
                 foreach ($response->getContent() as $key=>$condition){
                     if($condition['StatusType'] === 40 && $condition['Code'] !== 13000){
@@ -346,6 +403,21 @@ class IMLClient implements ICurlInject
     }
 
 
+    public function getLocationCollection()
+    {
+        $response = $this->requestListData('Location?type=json');
+        $resultData = (new LocationFilter($response->getContent()))->filterCollection();        
+        return $this->buildCollection($resultData,'Location');
+    }
+
+
+    public function getRegionCityCollection()
+    {
+        $response = $this->requestListData('RegionCity?type=json');
+        return $this->buildCollection($response->getContent(),'City');
+    }
+
+
     /**
      * Вернет города или несколько к которым принадлежит город,
      * В полученном объекте поле RegionIML
@@ -353,13 +425,15 @@ class IMLClient implements ICurlInject
      * @return Collection
      * @throws ExceptionIMLClient
      */
+    
+    
     public function getRegionByCity(string $city){
-        $response = $this->request('RegionCity?type=json', 'GET', [], true);
+        $response = $this->requestListData('RegionCity?type=json', 'GET', []);
         $shortest = 2;
         $result = [];
         $accurateResult = [];
         foreach ($response->getContent() as $reg){
-            $lev = levenshtein(mb_strtolower($city), mb_strtolower($reg['City']));
+            $levCity = levenshtein(mb_strtolower($city), mb_strtolower($reg['City']));
             if ($lev == 0) {
                 $accurateResult[] = $reg;
             }
@@ -373,6 +447,42 @@ class IMLClient implements ICurlInject
         }
         return $this->buildCollection($result,'City');
     }
+    
+    
+    
+    private function clearPlaceName($placeName)
+    {
+         $placeName = str_ireplace(['Г.', 'город'], '', $placeName);   
+         $placeName = str_ireplace ( ['РЕСП.', 'КРАЙ.', 'ОБЛ.'], ['РЕСПУБЛИКА', 'КРАЙ', 'ОБЛАСТЬ'], $placeName);
+         $placeName = trim(mb_strtoupper(str_ireplace('ё', 'е', $placeName)));
+         return $placeName;
+    }
+
+    
+    public function getRegionByCityRegion(string $city, string $region){
+        $response = $this->requestListData('RegionCity?type=json', 'GET', []);
+        $shortest = 2;
+        $result = [];
+        $accurateResult = [];
+        
+        foreach ($response->getContent() as $reg){
+            
+            
+            $levCity = levenshtein($this->clearPlaceName($city), $this->clearPlaceName($reg['City']));
+            $levRegion = levenshtein($this->clearPlaceName($region), $this->clearPlaceName($reg['Region']));
+            if ($levCity == 0 && $levRegion == 0) {
+                $accurateResult[] = $reg;
+            }
+
+            if ($levCity <= $shortest && $levRegion <= $shortest) {
+                $result[] = $reg;
+            }
+        }
+        if(count($accurateResult)>0){
+            return $this->buildCollection($accurateResult,'City');
+        }
+        return $this->buildCollection($result,'City');
+    }    
 
 
     /**

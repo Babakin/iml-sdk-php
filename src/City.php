@@ -39,15 +39,14 @@ class City extends BaseObject
     /**
      * @return string
      */
-    public function getRegion(){
-        return $this->RegionIML;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCityName(){
-        return $this->City;
+    public function __get($property)
+    {
+        
+        if (property_exists($this, $property)) 
+        {
+            return $this->$property;
+        }
+        
     }
 
 }
