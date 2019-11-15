@@ -294,6 +294,26 @@ class IMLClient implements ICurlInject
     }
 
 
+
+    /**
+     * получение структуры c url на pdf-файл со штрих-кодами заказа 
+     * @return IMLResponse
+     * @throws ExceptionIMLClient
+     */
+    public function getOrderBarcodesLinkData($imlBarCode)
+    {
+        if(!$imlBarCode)
+        {
+            throw new ExceptionIMLClient('У заказа не указан штрих-код');
+        }
+
+        $result = $this->request("Json/PrintBar", 'POST', ['BarCode' => $imlBarCode]);
+        return $result;
+
+    }
+
+
+
     /**
      * получение статуса заказа в IML
      * @return IMLResponse
