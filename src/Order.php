@@ -13,6 +13,13 @@ class Order
     use SplitStringCamesCase;
 
     /**
+     * штрих-код заказа, созданного в системе IML
+     * @var string
+     */
+    protected $barcode;
+    
+    
+    /**
      * Job – услуга, Code из справочника услуг, находится по адресу http://list.iml.ru/service
      * @var string
      */
@@ -183,6 +190,17 @@ class Order
         if($phone) $this->setPhone($phone);
         if($email) $this->setEmail($email);
         if($contactPerson) $this->setContactPerson($contactPerson);
+        return $this;
+    }
+
+
+
+    /**
+     * @param string $barcode
+     * @return $this
+     */
+    public function setBarcode(string $barcode){
+        $this->barcode = $barcode;
         return $this;
     }
 

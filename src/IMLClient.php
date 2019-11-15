@@ -293,6 +293,22 @@ class IMLClient implements ICurlInject
         return $this->sendOrder('v5/GetPlantCostOrder');
     }
 
+
+    /**
+     * получение статуса заказа в IML
+     * @return IMLResponse
+     * @throws ExceptionIMLClient
+     */
+    public function getStatusOrder($imlBarCode) :IMLResponse
+    {
+        if(!$imlBarCode)
+        {
+            throw new ExceptionIMLClient('У заказа не указан штрих-код');
+        }
+        return $this->request('Json/GetStatuses','POST',['BarCode' => $imlBarCode]);
+    }
+
+
     /**
      * Создание заказа в IML
      * @return IMLResponse
