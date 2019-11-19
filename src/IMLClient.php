@@ -425,7 +425,8 @@ class IMLClient implements ICurlInject
                 $response = $this->requestListData('Status?type=json', 'GET', []);
                 $data = [];
                 foreach ($response->getContent() as $key=>$condition){
-                    if($condition['StatusType'] === 40 && $condition['Code'] !== 13000){
+                    if($condition['StatusType'] === 40 && $condition['Code'] !== 13000 && !empty($condition['Name']))
+                    {
                         $data[] = $condition;
                     }
                 }
