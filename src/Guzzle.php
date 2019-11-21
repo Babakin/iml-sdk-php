@@ -29,11 +29,18 @@ class Guzzle implements ICurl
      * @return IMLResponse
      * @throws ExceptionIMLClient
      */
-    public function sendRequest(string $url, string $method = 'GET',  $login,  $password, array $data=[]) :IMLResponse{
+    public function sendRequest(string $url, string $method = 'GET',  $login,  $password, array $data=[], $convertResultFromJson = true) :IMLResponse{
         try{
             $client = new Client(['base_uri' => $url,'exceptions' => false,'debug' => $this->debug]);
             $responseGuzzle = $client->request($method, '', ['auth' => [$login, $password],'json'=>$data]);
-            return $this->convert($responseGuzzle);
+            if($convertResultFromJson)
+            {
+                return $this->convert($responseGuzzle);
+            }else
+            {
+                return new IMLResponse($responseGuzzle->getReasonPhrase(),$responseGuzzle->getStatusCode(),$responseGuzzle->getBody()->getContents());
+            }
+            
         }catch (\Exception $e){
             throw new ExceptionIMLClient('Ошибка отправки запроса Curl '.$e->getMessage());
         }

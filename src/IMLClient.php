@@ -155,7 +155,7 @@ class IMLClient implements ICurlInject
      * @return IMLResponse
      * @throws ExceptionIMLClient
      */
-    public function request(string $uri, string $method = 'GET',array $data=[],$listUri = false) :IMLResponse
+    public function request(string $uri, string $method = 'GET',array $data=[],$listUri = false, $convertResultFromJson = true) :IMLResponse
     {
         if(!$this->curl) 
         {
@@ -173,9 +173,9 @@ class IMLClient implements ICurlInject
         try{
             if($listUri)
             {
-                return $this->curl->sendRequest(self::BASE_URI_LIST .'/'.$uri, $method, $this->login, $this->password, $data);
+                return $this->curl->sendRequest(self::BASE_URI_LIST .'/'.$uri, $method, $this->login, $this->password, $data, $convertResultFromJson);
             }
-            return $this->curl->sendRequest($this->baseUriActive.'/'.$uri, $method, $this->login, $this->password, $data);
+            return $this->curl->sendRequest($this->baseUriActive.'/'.$uri, $method, $this->login, $this->password, $data, $convertResultFromJson);
         }catch (\Exception $exception){
             throw new ExceptionIMLClient('Ошибка запроса Curl');
         }
@@ -296,19 +296,19 @@ class IMLClient implements ICurlInject
 
 
     /**
-     * получение структуры c url на pdf-файл со штрих-кодами заказа 
+     * получение структуры с данными pdf-файла со штрих-кодами заказа 
      * @return IMLResponse
      * @throws ExceptionIMLClient
      */
-    public function getOrderBarcodesLinkData($imlBarCode)
+    public function getOrderBarcodesInPdfFormat($imlBarCode)
     {
         if(!$imlBarCode)
         {
             throw new ExceptionIMLClient('У заказа не указан штрих-код');
         }
 
-        $result = $this->request("Json/PrintBar", 'POST', ['BarCode' => $imlBarCode]);
-        return $result;
+        $pdfData = $this->request("/Json/PrintBar?Barcode={$imlBarCode}", 'GET', [], false, false);
+        return $pdfData;
 
     }
 
