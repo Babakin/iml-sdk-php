@@ -30,10 +30,9 @@ abstract class Collection implements IteratorAggregate, ArrayAccess, Countable
      * Препятствует добавлению в коллекцию объектов `чужого` типа.
      *
      * @param object $object Объект для проверки
-     * @return void
      * @throws ExceptionIMLClient
      */
-    protected function checkType(&$object) :void {
+    protected function checkType(&$object) {
         try{
             if ((new \ReflectionClass($object))->getShortName() != $this->type) {
                 throw new ExceptionIMLClient('Объект типа `' . get_class($object)

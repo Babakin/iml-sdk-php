@@ -67,6 +67,11 @@ class IMLClient implements ICurlInject
     private $conditions;
 
     /**
+     * @var VatVariantsCollection
+     */
+    private $vatVariants;
+
+    /**
      * @var CityCollection
      */
     private $cities;
@@ -98,6 +103,7 @@ class IMLClient implements ICurlInject
         $this->curl = $this->factory->getCurl();
         $this->points = $this->factory->getCollection('Point');
         $this->conditions = $this->factory->getCollection('Condition');
+        $this->vatVariants = $this->factory->getCollection('Condition');
         $this->cities = $this->factory->getCollection('City');
         $this->baseUriActive = IMLClient::BASE_URI;
     }
@@ -267,8 +273,16 @@ class IMLClient implements ICurlInject
      * @throws ExceptionIMLClient
      */
     private function checkOrder(){
-        if(is_null($this->order)) throw new ExceptionIMLClient('Нет исходных данных');
-        if(empty($this->order->getGoodItems())) throw new ExceptionIMLClient('В заказе нет ниодного грузового места');
+        if(is_null($this->order))
+        {
+            throw new ExceptionIMLClient('Нет исходных данных');
+        }
+
+        if(empty($this->order->getGoodItems())) 
+        {
+            throw new ExceptionIMLClient('В заказе нет ни одного грузового места');
+        }
+            
         return $this;
     }
 
@@ -346,7 +360,7 @@ class IMLClient implements ICurlInject
      */
     private function sendOrder(string $uri):IMLResponse{
         $this->checkOrder();
-        $this->getConditions();
+        // $this->getConditions();
 //        $this->addConditions();
         return $this->request($uri,'POST',$this->order->toArray());
     }
@@ -364,7 +378,7 @@ class IMLClient implements ICurlInject
      * @return Point|null
      * @throws ExceptionIMLClient
      */
-    public function getPointByCode(string $Code) :?Point{
+    public function getPointByCode(string $Code) :Point{
         $points = $this->getDeliveryPoints();
         foreach ($points as $point){
             if($point->getCode() == $Code) return $point;
@@ -393,17 +407,7 @@ class IMLClient implements ICurlInject
      */
     public function getDeliveryPointsCollection($sdType = null, $RegionCode =  null):PointCollection{
 
-            $params = [];
-            if($sdType)
-            {
-                $params[$$sdType] = $sdType;
-            }
-            
-            if($RegionCode)
-            {
-                $params[$$RegionCode] = $RegionCode;
-            }
-            
+            $params = compact('sdType', 'RegionCode');
             $paramsStr = implode("&", $params);
             $requestStr = ($paramsStr) ? 'sd?'.$paramsStr : 'sd';
             $response =  $this->requestListData($requestStr,'GET',[]);
@@ -437,6 +441,31 @@ class IMLClient implements ICurlInject
             }
         }
         return $this->conditions;
+    }
+
+
+    /*
+    запрос списка доступных значений НДС, чтобы указывать его для товаров Item (Используется для передачи в ОФД (тег ФФД 1199).
+    */
+    public function getVatVariants()
+    {
+        if($this->vatVariants->isEmpty()){
+            try{
+                $response = $this->requestListData('Status?type=json', 'GET', []);
+                $data = [];
+                foreach ($response->getContent() as $key => $vatItem){
+                    if($vatItem['StatusType'] === 52)
+                    {
+                        $data[] = $vatItem;
+                    }
+                }
+                $this->vatVariants = $this->buildCollection($data,'Condition');
+            }catch (\Exception $e){
+                if($e instanceof ExceptionIMLClient) throw $e;
+                throw new ExceptionIMLClient('Ошибка запроса к http://list.iml.ru/Status?type=json');
+            }
+        }
+        return $this->vatVariants;
     }
 
 

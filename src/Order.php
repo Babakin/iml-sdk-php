@@ -372,7 +372,7 @@ class Order
         }
     }
 
-    public function addConditions(ConditionCollection $conditions) :void {
+    public function addConditions(ConditionCollection $conditions) {
         foreach ($conditions as $condition){
             $this->goodItems = array_merge($this->goodItems,[$condition->toArray()]);
         }
@@ -385,12 +385,33 @@ class Order
         $this->goodItems = array_merge($this->goodItems,[$item->toArray()]);
     }
 
+
     /**
      * @return $this
      */
     public function testMode(){
         $this->test = true;
         return $this;
+    }
+
+
+    /**
+     * Добавляем услугу "Доставка" в заказ
+     * @param float $amountLine
+     * @return $this
+     */
+    public function setDeliveryCost(float $DeliveryCost)
+    {
+        $this->goodItems = array_merge($this->goodItems, ["productNo" => "Доставка", "itemType" => 3, "allowed" => 0, 'amountLine' => $DeliveryCost]);
+    }
+
+
+    /**
+    * Включаем фулфилмент в заказе
+    **/
+    public function enableFullFilment()
+    {
+        $this->goodItems = array_merge($this->goodItems, ["productNo" => "10000", "itemType" => "14", "allowed" => "1", "productBarCode" => "00000"]);
     }
 
     /**
