@@ -140,7 +140,10 @@ class Item
     public function __call($method, $args) {
         if (count($args)>1) throw new ExceptionIMLClient('Неверные параметры для свойства');
         $prop = $this->stringSplitCamelCase($method,'set');
-        if(!property_exists($this,$prop)) throw new ExceptionIMLClient('Неверное имя свойства');
+        if(!property_exists($this,$prop)) 
+        {
+            throw new ExceptionIMLClient('Неверное имя свойства');
+        }
         $this->$prop = $args[0];
         return $this;
     }
@@ -170,10 +173,19 @@ class Item
     }
 
     /**
-     * Наложенная стоисомть
+     * Наложенная стоимость
      * @return float
      */
     public function getStatisticalValueLine(){
         return $this->statisticalValueLine;
+    }
+    
+    /**
+     * код категории НДС
+     * @return int
+     */    
+    public function setVATRate($VATRate)
+    {
+        $this->VATRate = $VATRate;
     }
 }
