@@ -414,6 +414,8 @@ class Order
         $this->goodItems = array_merge($this->goodItems, ["productNo" => "10000", "itemType" => "14", "allowed" => "1", "productBarCode" => "00000"]);
     }
 
+
+
     /**
      * @param string $Code
      * @return $this

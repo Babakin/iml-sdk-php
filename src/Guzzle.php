@@ -29,10 +29,11 @@ class Guzzle implements ICurl
      * @return IMLResponse
      * @throws ExceptionIMLClient
      */
-    public function sendRequest(string $url, string $method = 'GET',  $login,  $password, array $data=[], $convertResultFromJson = true) :IMLResponse{
+    public function sendRequest(string $url, string $method = 'GET',  $login,  $password, array $data=[], $convertResultFromJson = true, float $connect_timeout = 0) :IMLResponse{
         try{
             $client = new Client(['base_uri' => $url,'exceptions' => false,'debug' => $this->debug]);
-            $responseGuzzle = $client->request($method, '', ['auth' => [$login, $password],'json'=>$data]);
+            $responseGuzzle = $client->request($method, '', ['auth' => [$login, $password],'json'=>$data,
+                                               'connect_timeout' => $connect_timeout]);
             if($convertResultFromJson)
             {
                 return $this->convert($responseGuzzle);

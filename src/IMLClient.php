@@ -93,6 +93,9 @@ class IMLClient implements ICurlInject
 
     const BASE_URI_LIST = 'http://list.iml.ru';
 
+
+    // timeout на время соединения с сервером API
+    private $connectTimeout = 0;
     /**
      * IMLClient constructor.
      * @param Factory $factory
@@ -152,6 +155,12 @@ class IMLClient implements ICurlInject
         return $this;
     }
 
+
+    public function setConnectTimeout(float $connectTimeout)
+    {
+        $this->connectTimeout = $connectTimeout;
+    }
+
     /**
      * Запрос к IML
      * @param string $uri
@@ -179,9 +188,9 @@ class IMLClient implements ICurlInject
         try{
             if($listUri)
             {
-                return $this->curl->sendRequest(self::BASE_URI_LIST .'/'.$uri, $method, $this->login, $this->password, $data, $convertResultFromJson);
+                return $this->curl->sendRequest(self::BASE_URI_LIST .'/'.$uri, $method, $this->login, $this->password, $data, $convertResultFromJson, $this->connectTimeout);
             }
-            return $this->curl->sendRequest($this->baseUriActive.'/'.$uri, $method, $this->login, $this->password, $data, $convertResultFromJson);
+            return $this->curl->sendRequest($this->baseUriActive.'/'.$uri, $method, $this->login, $this->password, $data, $convertResultFromJson, $this->connectTimeout);
         }catch (\Exception $exception){
             throw new ExceptionIMLClient('Ошибка запроса Curl');
         }
@@ -349,7 +358,11 @@ class IMLClient implements ICurlInject
      * @throws ExceptionIMLClient
      */
     public function createOrder():IMLResponse{
-        if(!$this->order->getCustomerOrder()) $this->order->setCustomerOrder(rand ( 10000 , 99999 ));
+        if(!$this->order->getCustomerOrder()) 
+        {
+            $this->order->setCustomerOrder(rand( 10000 , 99999 ));
+        }
+        // ___p($this->order->toArray());
         return $this->sendOrder('/Json/CreateOrder');
     }
 
@@ -518,9 +531,10 @@ class IMLClient implements ICurlInject
     
     private function clearPlaceName($placeName)
     {
-         $placeName = str_ireplace(['Г.', 'город'], '', $placeName);   
-         $placeName = str_ireplace ( ['РЕСП.', 'КРАЙ.', 'ОБЛ.'], ['РЕСПУБЛИКА', 'КРАЙ', 'ОБЛАСТЬ'], $placeName);
+         $placeName = str_ireplace([' Г.', ' город'], '', $placeName);   
+         $placeName = str_ireplace ([' РЕСП.', ' КРАЙ.', ' ОБЛ.'], [' РЕСПУБЛИКА', ' КРАЙ', ' ОБЛАСТЬ'], $placeName);
          $placeName = trim(mb_strtoupper(str_ireplace('ё', 'е', $placeName)));
+         
          return $placeName;
     }
 
@@ -530,12 +544,10 @@ class IMLClient implements ICurlInject
         $shortest = 2;
         $result = [];
         $accurateResult = [];
-        
         foreach ($response->getContent() as $reg){
-            
-            
             $levCity = levenshtein($this->clearPlaceName($city), $this->clearPlaceName($reg['City']));
             $levRegion = levenshtein($this->clearPlaceName($region), $this->clearPlaceName($reg['Region']));
+
             if ($levCity == 0 && $levRegion == 0) {
                 $accurateResult[] = $reg;
             }

@@ -176,4 +176,10 @@ class Item
     public function getStatisticalValueLine(){
         return $this->statisticalValueLine;
     }
+
+
+    public function setVATRate($VATRate)
+    {
+        $this->VATRate = $VATRate;
+    }
 }
