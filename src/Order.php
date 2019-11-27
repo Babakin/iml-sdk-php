@@ -433,7 +433,10 @@ class Order
      */
     public function __call($name, $arguments){
         $prop = $this->stringSplitCamelCase($name,'get');
-        if(!property_exists($this,$prop)) throw new ExceptionIMLClient('Неверное имя свойства');
+        if(!property_exists($this,$prop)) 
+            {
+                throw new ExceptionIMLClient('Неверное имя свойства');
+            }
         return $this->$prop;
     }
 }
