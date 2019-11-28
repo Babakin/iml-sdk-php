@@ -367,7 +367,11 @@ class Order
         /** @var Item $item **/
         foreach ($items as $item){
             $this->setItem($item);
-            $this->amount += $item->getAmount()*$item->getQuantity();
+            // если тип доставки связан с кассовым обслуживанием - заполнять Amount
+            if(in_array($this->job, [self::SELF_DELIVERY_CASH_SERVICE, self::DELIVERY_CASH_SERVICE]))
+            {
+                $this->amount += $item->getAmount()*$item->getQuantity();    
+            }
             $this->valuatedAmount += $item->getStatisticalValueLine()*$item->getQuantity();
         }
     }

@@ -130,7 +130,7 @@ class IMLClient implements ICurlInject
     public function logIn(string $login, string $password){
         $this->login = $login;
         $this->password = $password;
-        $this->checkAuth();
+        // $this->checkAuth();
         return $this;
     }
 
@@ -180,10 +180,7 @@ class IMLClient implements ICurlInject
         {
             throw new ExceptionIMLClient('Логин или пароль отсутствуют, используйте метод logIn');
         }
-        if($this->unauthorized) 
-        {
-            throw new ExceptionIMLClient('Нет авторизации');
-        }
+
 
         try{
             if($listUri)
@@ -226,7 +223,7 @@ class IMLClient implements ICurlInject
      */
     private function checkAuth(){
         if($this->unauthorized){
-            $response = $this->curl->sendRequest($this->baseUriActive.'/'.'v5/GetPrice', 'POST', $this->login, $this->password, ['weigth'=>2.3]);
+            $response = $this->curl->sendRequest($this->baseUriActive.'/'.'v5/GetPrice', 'POST', $this->login, $this->password, ['weigth'=> 2.3]);
             if($response->getStatusCode() !== 401 && $response->getStatusCode() !== 500){
                 $this->unauthorized = false;
             }
@@ -314,6 +311,7 @@ class IMLClient implements ICurlInject
      */
     public function calculate() :IMLResponse{
         // ___p($this->order->toArray());
+        // die();
         return $this->sendOrder('v5/GetPlantCostOrder');
     }
 
@@ -532,10 +530,14 @@ class IMLClient implements ICurlInject
     
     private function clearPlaceName($placeName)
     {
-         $placeName = str_ireplace([' Г.', ' город'], '', $placeName);   
-         $placeName = str_ireplace ([' РЕСП.', ' КРАЙ.', ' ОБЛ.'], [' РЕСПУБЛИКА', ' КРАЙ', ' ОБЛАСТЬ'], $placeName);
-         $placeName = trim(mb_strtoupper(str_ireplace('ё', 'е', $placeName)));
-         
+        // ___p($placeName);
+        $clearAr = [' ГОРОД', 'АО - ЮГРА', 'РЕСП.', ' КРАЙ.', ' ОБЛ.', 'РЕСПУБЛИКА', ' КРАЙ', ' ОБЛАСТЬ', 
+        'АВТОНОМНЫЙ ОКРУГ', ' АО.', ' Г.'];
+        $placeName = trim(mb_strtoupper(str_ireplace('ё', 'е', $placeName)));
+        $placeName = str_ireplace($clearAr, '', $placeName);   
+        // $placeName = str_ireplace ([' РЕСП.', ' КРАЙ.', ' ОБЛ.'], [' РЕСПУБЛИКА', ' КРАЙ', ' ОБЛАСТЬ'], $placeName);
+
+        // ___p($placeName);
          return $placeName;
     }
 
@@ -545,7 +547,11 @@ class IMLClient implements ICurlInject
         $shortest = 2;
         $result = [];
         $accurateResult = [];
-        foreach ($response->getContent() as $reg){
+        // $arr = [['City' => 'Ханты-Мансийск г.', 
+        // 'Region' => 'Ханты-Мансийский Автономный округ АО.']];
+        //foreach ($arr as $reg)
+        foreach ($response->getContent() as $reg)
+        {
             $levCity = levenshtein($this->clearPlaceName($city), $this->clearPlaceName($reg['City']));
             $levRegion = levenshtein($this->clearPlaceName($region), $this->clearPlaceName($reg['Region']));
 
@@ -557,9 +563,11 @@ class IMLClient implements ICurlInject
                 $result[] = $reg;
             }
         }
+        
         if(count($accurateResult)>0){
             return $this->buildCollection($accurateResult,'City');
         }
+        
         return $this->buildCollection($result,'City');
     }    
 

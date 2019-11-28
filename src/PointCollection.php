@@ -44,17 +44,37 @@ class PointCollection extends Collection
 	}
 	
 	
+	private function clearPlaceName($placeName)
+    {
+        // ___p($placeName);
+        $clearAr = [' ГОРОД', 'АО - ЮГРА', 'РЕСП.', ' КРАЙ.', ' ОБЛ.', 'РЕСПУБЛИКА', ' КРАЙ', ' ОБЛАСТЬ', 
+        'АВТОНОМНЫЙ ОКРУГ', ' АО.', ' Г.'];
+        $placeName = trim(mb_strtoupper(str_ireplace('ё', 'е', $placeName)));
+        $placeName = str_ireplace($clearAr, '', $placeName);   
+        // $placeName = str_ireplace ([' РЕСП.', ' КРАЙ.', ' ОБЛ.'], [' РЕСПУБЛИКА', ' КРАЙ', ' ОБЛАСТЬ'], $placeName);
+
+        // ___p($placeName);
+         return $placeName;
+    }	
+	
+	
 	public function findByPlace($city, $region = null, $job = null)
 	{
-		$city = trim(mb_strtoupper(str_ireplace('ё', 'е', $city)));
-		$city = str_ireplace(['Г.', 'город'], '', $city);
+		// $city = trim(mb_strtoupper(str_ireplace('ё', 'е', $city)));
+		// $city = str_ireplace(['Г.', 'город'], '', $city);
+		// if($region)
+		// {
+		// 	$region = trim(mb_strtoupper(str_ireplace('ё', 'е', $region)));
+		// 	$region = str_ireplace ( ['РЕСП.', 'КРАЙ.', 'ОБЛ.'], ['РЕСПУБЛИКА', 'КРАЙ', 'ОБЛАСТЬ'], $region);
+		// 	$region = str_ireplace(['Г.', 'город'], '', $region);
+		// }
+		
+		
+		$city = $this->clearPlaceName($city);
 		if($region)
 		{
-			$region = trim(mb_strtoupper(str_ireplace('ё', 'е', $region)));
-			$region = str_ireplace ( ['РЕСП.', 'КРАЙ.', 'ОБЛ.'], ['РЕСПУБЛИКА', 'КРАЙ', 'ОБЛАСТЬ'], $region);
-			$region = str_ireplace(['Г.', 'город'], '', $region);
+			$region = $this->clearPlaceName($region);
 		}
-		
 		
 
 		$foundedCollection  = [];
@@ -69,8 +89,12 @@ class PointCollection extends Collection
 			}
 
 
-			$upperFormCity = mb_strtoupper($item->getFormCity());
-			$upperFormRegion = mb_strtoupper($item->getFormRegion());
+			// $upperFormCity = mb_strtoupper($item->getFormCity());
+			// $upperFormRegion = mb_strtoupper($item->getFormRegion());
+			
+			$upperFormCity = $this->clearPlaceName($item->getFormCity());
+			$upperFormRegion = $this->clearPlaceName($item->getFormRegion());			
+			
 			if(empty($upperFormCity) && !empty($upperFormRegion))
 			{
 				$upperFormCity = $upperFormRegion;

@@ -179,16 +179,12 @@ class Item
     public function getStatisticalValueLine(){
         return $this->statisticalValueLine;
     }
-<<<<<<< HEAD
 
-
-=======
-    
     /**
      * код категории НДС
      * @return int
      */    
->>>>>>> dfe089b243e51c1e56b57d5ff7d8136ec1c68086
+
     public function setVATRate($VATRate)
     {
         $this->VATRate = $VATRate;
