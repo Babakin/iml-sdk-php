@@ -318,6 +318,21 @@ class IMLClient implements ICurlInject
 
 
     /**
+     * Создание заказа в IML
+     * @return IMLResponse
+     * @throws ExceptionIMLClient
+     */
+    public function createOrder():IMLResponse{
+        if(!$this->order->getCustomerOrder()) 
+        {
+            $this->order->setCustomerOrder(rand( 10000 , 99999 ));
+        }
+        // ___p($this->order->toArray());
+        return $this->sendOrder('/Json/CreateOrder');
+    }
+
+
+    /**
      * получение структуры с данными pdf-файла со штрих-кодами заказа 
      * @return IMLResponse
      * @throws ExceptionIMLClient
@@ -351,19 +366,6 @@ class IMLClient implements ICurlInject
     }
 
 
-    /**
-     * Создание заказа в IML
-     * @return IMLResponse
-     * @throws ExceptionIMLClient
-     */
-    public function createOrder():IMLResponse{
-        if(!$this->order->getCustomerOrder()) 
-        {
-            $this->order->setCustomerOrder(rand( 10000 , 99999 ));
-        }
-        // ___p($this->order->toArray());
-        return $this->sendOrder('/Json/CreateOrder');
-    }
 
     /**
      * @param string $uri
@@ -420,8 +422,9 @@ class IMLClient implements ICurlInject
     public function getDeliveryPointsCollection($sdType = null, $RegionCode =  null):PointCollection{
 
             $params = compact('sdType', 'RegionCode');
-            $paramsStr = implode("&", $params);
+            $paramsStr = http_build_query($params);
             $requestStr = ($paramsStr) ? 'sd?'.$paramsStr : 'sd';
+            // ___p($requestStr);
             $response =  $this->requestListData($requestStr,'GET',[]);
             // фильтруем некорректные пвз
             $resultData = (new PickPointsFilter($response->getContent()))->filterCollection();        

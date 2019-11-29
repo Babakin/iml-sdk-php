@@ -8,21 +8,7 @@ class PointCollection extends Collection
 {
 	protected $type = 'Point';
 	// коэффициент совпадения при поиске по городу или региону
-	const SIM_MIN_COEF = 80;  
-	
-
-	// public function getPlacesByJob($Job)
-	// {
-	// 	$resultList = [];
-	// 	foreach ($this->placesList as $key => $item) {
-	// 		if(in_array($Job, $item['Jobs']))
-	// 		{
-	// 			$resultList[] = array_merge($item, compact('key'));
-	// 		}
-	// 	}
-
-	// 	return $resultList;
-	// }
+	const SIM_MIN_COEF = 90;  
 	
 	
 	public function findByID($ID)
