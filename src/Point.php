@@ -80,7 +80,7 @@ class Point extends BaseObject
     }
     
     
-    public function getFormAddress()
+    public function getFormAddress(array $excludes = [])
     {
         $params = [
         'FormRegion',
@@ -94,7 +94,7 @@ class Point extends BaseObject
         
         $formatAr = [];
         foreach ($params as $param) {
-            if($this->$param)
+            if(!in_array($param, $excludes) && $this->$param)
             {
                 $formatAr[] = $this->$param;    
             }

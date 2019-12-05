@@ -391,9 +391,12 @@ class IMLClient implements ICurlInject
      * @throws ExceptionIMLClient
      */
     public function getPointByCode(string $Code) :Point{
-        $points = $this->getDeliveryPoints();
+        $points = $this->getDeliveryPointsCollection();
         foreach ($points as $point){
-            if($point->getCode() == $Code) return $point;
+            if($point->getCode() == $Code) 
+            {
+                return $point;   
+            }
         }
         return null;
     }
