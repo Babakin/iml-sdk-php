@@ -10,7 +10,6 @@ class PointCollection extends Collection
 	// коэффициент совпадения при поиске по городу или региону
 	const SIM_MIN_COEF = 90;  
 	
-	
 	public function findByID($ID)
 	{
 		foreach ($this as $key => $item)
