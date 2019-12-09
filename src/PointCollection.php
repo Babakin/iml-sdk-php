@@ -28,6 +28,49 @@ class PointCollection extends Collection
 		return $item['PaymentPossible'] == 1;
 	}
 	
+
+    private function cmpByAddr($a, $b)
+    {
+
+		$addrA = $a->getFormAddress();
+		$addrB = $b->getFormAddress();
+		$addrA = mb_strtoupper($addrA, 'UTF-8');
+		$addrB = mb_strtoupper($addrB, 'UTF-8');
+		
+
+
+        $isMoscowA = mb_stripos($addrA, 'МОСКВА Г.', 0,  'UTF-8') !== false;
+        $isSpbA = mb_stripos($addrA, 'САНКТ-ПЕТЕРБУРГ Г.',0, 'UTF-8') !== false;
+
+
+        $isMoscowB = mb_stripos($addrB, 'МОСКВА Г.',0, 'UTF-8') !== false;
+        $isSpbB = mb_stripos($addrB, 'САНКТ-ПЕТЕРБУРГ Г.',0, 'UTF-8') !== false;
+
+
+        if ($isMoscowA && $isSpbB) {
+            return -1;
+        } else if ($isMoscowB && $isSpbA) {
+            return 1;
+		} 
+		else if (($isMoscowA || $isSpbA) && !($isMoscowB || $isSpbB))
+		{
+            return -1;
+        } else if (($isMoscowB || $isSpbB) && !($isMoscowA || $isSpbA)) {
+            return 1;
+		} 
+		else {
+            return strcmp($addrA, $addrB);
+        }
+
+    }
+
+
+
+	public function sortByAddr()
+	{
+		uasort($this->collection, array($this, 'cmpByAddr'));
+		return $this;
+	}
 	
 	private function clearPlaceName($placeName)
     {
@@ -72,10 +115,6 @@ class PointCollection extends Collection
 			{
 				continue;
 			}
-
-
-			// $upperFormCity = mb_strtoupper($item->getFormCity());
-			// $upperFormRegion = mb_strtoupper($item->getFormRegion());
 			
 			$upperFormCity = $this->clearPlaceName($item->getFormCity());
 			$upperFormRegion = $this->clearPlaceName($item->getFormRegion());			

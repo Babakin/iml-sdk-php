@@ -387,6 +387,25 @@ class IMLClient implements ICurlInject
         return;
     }
 
+
+    /**
+     * @param string $ID
+     * @return Point|null
+     * @throws ExceptionIMLClient
+     */
+    public function getPointByID(string $ID) :Point{
+        $points = $this->getDeliveryPointsCollection();
+        foreach ($points as $point){
+            if($point->getID() == $ID) 
+            {
+                return $point;   
+            }
+        }
+        return null;
+    }
+
+
+
     /**
      * @param string $Code
      * @return Point|null
@@ -431,9 +450,19 @@ class IMLClient implements ICurlInject
             $response =  $this->requestListData($requestStr,'GET',[]);
             // фильтруем некорректные пвз
             $resultData = (new PickPointsFilter($response->getContent()))->filterCollection();        
-            return $this->buildCollection($resultData, 'Point');
+            return $this->buildCollection($resultData, 'Point')->sortByAddr();
     }
     
+
+    /**
+     * @return PointCollection
+     * @throws ExceptionIMLClient
+     */
+    public function getSortedDeliveryPointsCollection($sdType = null, $RegionCode =  null):PointCollection
+    {
+        $dpCollection = $this->getDeliveryPointsCollection($sdType , $RegionCode);
+        return $dpCollection->sortByAddr();
+    }
     
     
 
@@ -499,6 +528,12 @@ class IMLClient implements ICurlInject
     {
         $response = $this->requestListData('RegionCity?type=json');
         return $this->buildCollection($response->getContent(),'City');
+    }
+
+    public function getSortedRegionCityCollection($setCapitalsAtBeginning = true)
+    {
+        $collection  = $this->getRegionCityCollection();
+        return $collection->sortByCity($setCapitalsAtBeginning);
     }
 
 
