@@ -21,6 +21,20 @@ class PointCollection extends Collection
 		}
 		return false;
 	}
+
+
+	// получить  первый ПВЗ, у которого возможно кассовое обслуживание
+	public function firstC24KO()
+	{
+		foreach ($this as $key => $item)
+		{
+			if(!empty($item->getPaymentType()))
+			{
+				return $item;
+			}
+		}
+		return false;
+	}
 	
 	
 	private function hasCashService($item)

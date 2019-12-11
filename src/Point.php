@@ -22,6 +22,7 @@ class Point extends BaseObject
     protected $FittingRoom;
     protected $PaymentCard;
     protected $PaymentPossible;
+    protected $PaymentType;
     protected $ReceiptOrder;
     protected $Latitude;
     protected $Longitude;
