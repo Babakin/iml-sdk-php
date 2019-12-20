@@ -1,7 +1,9 @@
 <?php
 
 namespace IMLSdk;
-
+/**
+ * Склад IML
+ */
 class Location extends BaseObject
 {
 	

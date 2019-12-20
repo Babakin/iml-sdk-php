@@ -4,8 +4,7 @@ namespace IMLSdk;
 
 use IMLSdk\Guzzle;
 use GuzzleHttp\Client;
-use IMLSdk\Filters\LocationFilter;
-use IMLSdk\Filters\PickPointsFilter;
+use IMLSdk\Filters\FilterFactory;
 
 /**
  * Class IMLClient
@@ -155,7 +154,12 @@ class IMLClient implements ICurlInject
         return $this;
     }
 
-
+    /**
+     * Ставим timeout соединения в сек
+     *
+     * @param float $connectTimeout
+     * @return void
+     */
     public function setConnectTimeout(float $connectTimeout)
     {
         $this->connectTimeout = $connectTimeout;
@@ -167,10 +171,11 @@ class IMLClient implements ICurlInject
      * @param string $method
      * @param array $data
      * @param bool $listUri используется для получения данных из IML list
+     * @param bool $convertResultFromJson Включить конвертирование ответа из json
      * @return IMLResponse
      * @throws ExceptionIMLClient
      */
-    public function request(string $uri, string $method = 'GET',array $data=[],$listUri = false, $convertResultFromJson = true) :IMLResponse
+    public function request(string $uri, string $method = 'GET',array $data=[], bool $listUri = false, bool $convertResultFromJson = true) :IMLResponse
     {
         if(!$this->curl) 
         {
@@ -334,10 +339,11 @@ class IMLClient implements ICurlInject
 
     /**
      * получение структуры с данными pdf-файла со штрих-кодами заказа 
+     * @param string $imlBarCode штрих-код заказа
      * @return IMLResponse
      * @throws ExceptionIMLClient
      */
-    public function getOrderBarcodesInPdfFormat($imlBarCode)
+    public function getOrderBarcodesInPdfFormat(string $imlBarCode):IMLResponse
     {
         if(!$imlBarCode)
         {
@@ -353,10 +359,11 @@ class IMLClient implements ICurlInject
 
     /**
      * получение статуса заказа в IML
+     * @param string $imlBarCode штрих-код заказа
      * @return IMLResponse
      * @throws ExceptionIMLClient
      */
-    public function getStatusOrder($imlBarCode) :IMLResponse
+    public function getStatusOrder(string $imlBarCode) :IMLResponse
     {
         if(!$imlBarCode)
         {
@@ -372,17 +379,17 @@ class IMLClient implements ICurlInject
      * @return IMLResponse
      * @throws ExceptionIMLClient
      */
-    private function sendOrder(string $uri):IMLResponse{
+    private function sendOrder(string $uri):IMLResponse
+    {
         $this->checkOrder();
-        // $this->getConditions();
-//        $this->addConditions();
         return $this->request($uri,'POST',$this->order->toArray());
     }
 
     /**
      * Собираем условия выдачи в Order
      */
-    private function addConditions():void {
+    private function addConditions():void 
+    {
         $this->order->addConditions($this->conditions);
         return;
     }
@@ -437,11 +444,14 @@ class IMLClient implements ICurlInject
 
 
 
-    /**
+    /** 
+     * Получим список ПВЗ 
+     * @param string $sdType поле Type  в списке ПВЗ (1 - пункт выдачи, 12 - постамат)
+     * @param string $RegionCode Код региона для ПВЗ
      * @return PointCollection
      * @throws ExceptionIMLClient
      */
-    public function getDeliveryPointsCollection($sdType = null, $RegionCode =  null):PointCollection{
+    public function getDeliveryPointsCollection(string $sdType = null, string  $RegionCode =  null):PointCollection{
 
             $params = compact('sdType', 'RegionCode');
             $paramsStr = http_build_query($params);
@@ -449,7 +459,7 @@ class IMLClient implements ICurlInject
             // ___p($requestStr);
             $response =  $this->requestListData($requestStr,'GET',[]);
             // фильтруем некорректные пвз
-            $resultData = (new PickPointsFilter($response->getContent()))->filterCollection();        
+            $resultData = (FilterFactory::create('pickpoints'))->filterCollection($response->getContent());
             return $this->buildCollection($resultData, 'Point')->sortByAddr();
     }
     
@@ -491,10 +501,13 @@ class IMLClient implements ICurlInject
     }
 
 
-    /*
-    запрос списка доступных значений НДС, чтобы указывать его для товаров Item (Используется для передачи в ОФД (тег ФФД 1199).
-    */
-    public function getVatVariants()
+
+    /**
+     * запрос списка доступных значений НДС, чтобы указывать его для товаров Item (Используется для передачи в ОФД (тег ФФД 1199).
+     *
+     * @return ConditionCollection
+     */
+    public function getVatVariants():ConditionCollection
     {
         if($this->vatVariants->isEmpty()){
             try{
@@ -516,37 +529,50 @@ class IMLClient implements ICurlInject
     }
 
 
-    public function getLocationCollection()
+    /**
+     * Получить список складов 
+     *
+     * @return LocationCollection
+     */
+    public function getLocationCollection():LocationCollection
     {
         $response = $this->requestListData('Location?type=json');
-        $resultData = (new LocationFilter($response->getContent()))->filterCollection();        
+        $resultData = (FilterFactory::create('location'))->filterCollection($response->getContent());
         return $this->buildCollection($resultData,'Location');
     }
 
-
-    public function getRegionCityCollection()
+    /**
+     * Получить список населенных пунктов для доставки курьером
+     *
+     * @return CityCollection
+     */
+    public function getRegionCityCollection():CityCollection
     {
         $response = $this->requestListData('RegionCity?type=json');
         return $this->buildCollection($response->getContent(),'City');
     }
 
-    public function getSortedRegionCityCollection($setCapitalsAtBeginning = true)
+    /**
+     * Получить отстортированная список населенных пунктов для доставки курьером (сначала - столицы)
+     *
+     * @return CityCollection
+     */
+    public function getSortedRegionCityCollection():CityCollection
     {
         $collection  = $this->getRegionCityCollection();
-        return $collection->sortByCity($setCapitalsAtBeginning);
+        return $collection->sortByCity();
     }
 
 
     /**
-     * Вернет города или несколько к которым принадлежит город,
+     * Поиск в списке доставки курьером по городу $city
      * В полученном объекте поле RegionIML
-     * @param string $city
-     * @return Collection
+     * @param string $city 
+     * @return CityCollection Все пункты, где встречается город
      * @throws ExceptionIMLClient
      */
-    
-    
-    public function getRegionByCity(string $city){
+    public function getRegionByCity(string $city):CityCollection
+    {
         $response = $this->requestListData('RegionCity?type=json', 'GET', []);
         $shortest = 2;
         $result = [];
@@ -568,7 +594,12 @@ class IMLClient implements ICurlInject
     }
     
     
-    
+	/**
+	 * Очистка названий города или региона от ненужных для поиска фрагментов и перевод в верхний регистр
+	 *
+	 * @param [string] $placeName
+	 * @return string
+	 */    
     private function clearPlaceName($placeName)
     {
         // ___p($placeName);
@@ -582,8 +613,16 @@ class IMLClient implements ICurlInject
          return $placeName;
     }
 
-    
-    public function getRegionByCityRegion(string $city, string $region){
+    /**
+     * Поиск в списке доставки курьером по городу $city и региону
+     * В полученном объекте поле RegionIML
+     * @param string $city 
+     * @param string $region 
+     * @return CityCollection Все пункты, где встречается город
+     * @throws ExceptionIMLClient
+     */
+    public function getRegionByCityRegion(string $city, string $region):CityCollection
+    {
         $response = $this->requestListData('RegionCity?type=json', 'GET', []);
         $shortest = 2;
         $result = [];

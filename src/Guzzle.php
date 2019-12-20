@@ -25,17 +25,21 @@ class Guzzle implements ICurl
      * @param string $method
      * @param string $login
      * @param string $password
-     * @param array $data
+     * @param array $data Поля запроса
+     * @param bool $convertResultFromJson - Конвертировать ответ API из json (если получаем pdf со штрих-кодами - не нужно)
+     * @param float $connect_timeout Timeout для подключения к API 
      * @return IMLResponse
      * @throws ExceptionIMLClient
      */
-    public function sendRequest(string $url, string $method = 'GET',  $login,  $password, array $data=[], $convertResultFromJson = true, float $connect_timeout = 0) :IMLResponse{
+    public function sendRequest(string $url, string $method = 'GET', string $login, string  $password, array $data=[],
+     bool $convertResultFromJson = true, float $connect_timeout = 0) :IMLResponse
+     {
         try{
             $client = new Client(['base_uri' => $url,'exceptions' => false,'debug' => $this->debug,
                 'headers' => [ 'Content-Type' => 'application/json' ]
             ]);
 
-            $responseGuzzle = $client->request($method, '', ['auth' => [$login, $password], //'json'=>$data,
+            $responseGuzzle = $client->request($method, '', ['auth' => [$login, $password], 
                                                'connect_timeout' => $connect_timeout,
                                                 'body' => json_encode($data, JSON_UNESCAPED_UNICODE)
                                            ]);
@@ -71,7 +75,7 @@ class Guzzle implements ICurl
     }
     
     
-        /**
+    /** Запрос без авторизации по логину и паролю (специально для https://list.iml.ru)
      * @param string $url
      * @param string $method
      * @param array $data

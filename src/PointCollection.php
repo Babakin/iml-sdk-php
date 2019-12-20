@@ -1,15 +1,19 @@
 <?php
-
-
 namespace IMLSdk;
-
 
 class PointCollection extends Collection
 {
 	protected $type = 'Point';
+
 	// коэффициент совпадения при поиске по городу или региону
 	const SIM_MIN_COEF = 90;  
 	
+	/**
+	 * Поиск ПВЗ по полю ID
+	 *
+	 * @param [int] $ID
+	 * @return boolean|Point
+	 */
 	public function findByID($ID)
 	{
 		foreach ($this as $key => $item)
@@ -23,7 +27,11 @@ class PointCollection extends Collection
 	}
 
 
-	// получить  первый ПВЗ, у которого возможно кассовое обслуживание
+	/**
+	 * получить  первый ПВЗ, у которого возможно кассовое обслуживание
+	 *
+	 * @return boolean|Point 
+	 */
 	public function firstC24KO()
 	{
 		foreach ($this as $key => $item)
@@ -36,14 +44,25 @@ class PointCollection extends Collection
 		return false;
 	}
 	
-	
-	private function hasCashService($item)
+	/**
+	 * проверка того, что ПВЗ имеет кассовое обслуживание 
+	 *
+	 * @param [array] $item
+	 * @return boolean
+	 */
+	private function hasCashService(array $item):boolean
 	{
 		return $item['PaymentPossible'] == 1;
 	}
 	
-
-    private function cmpByAddr($a, $b)
+	/**
+	 * Функция для сверки позиций двух ПВЗ при сортировке в зависимости от полей адреса
+	 *
+	 * @param [Point] $a
+	 * @param [Point] $b
+	 * @return int
+	 */
+    private function cmpByAddr(Point $a, Point $b):int
     {
 
 		$addrA = $a->getFormAddress();
@@ -79,14 +98,25 @@ class PointCollection extends Collection
     }
 
 
-
-	public function sortByAddr()
+	/**
+	 * Функция для сортировки текущего списка ПВЗ 
+	 * сначала Москва и Санкт-Петербург  - затем в алфавитном порядке - остальные 
+	 *
+	 * @return void
+	 */
+	public function sortByAddr():PointCollection
 	{
 		uasort($this->collection, array($this, 'cmpByAddr'));
 		return $this;
 	}
 	
-	private function clearPlaceName($placeName)
+	/**
+	 * Очистка названий города или региона от ненужных для поиска фрагментов и перевод в верхний регистр
+	 *
+	 * @param [string] $placeName
+	 * @return string
+	 */
+	private function clearPlaceName(string $placeName):string
     {
         // ___p($placeName);
         $clearAr = [' ГОРОД', 'АО - ЮГРА', 'РЕСП.', ' КРАЙ.', ' ОБЛ.', 'РЕСПУБЛИКА', ' КРАЙ', ' ОБЛАСТЬ', 
@@ -100,18 +130,19 @@ class PointCollection extends Collection
     }	
 	
 	
-	public function findByPlace($city, $region = null, $job = null)
+
+	/**
+	 * Поиск в списке ПВЗ определенных ПВЗ, относящихся к данному городу и региону  и услуге (job)
+	 *
+	 * @param [string] $city
+	 * @param [string] $region
+	 * @param [string] $job
+	 * @return PointCollection
+	 */
+	public function findByPlace(string $city, string $region = null, string $job = null):PointCollection
 	{
-		// $city = trim(mb_strtoupper(str_ireplace('ё', 'е', $city)));
-		// $city = str_ireplace(['Г.', 'город'], '', $city);
-		// if($region)
-		// {
-		// 	$region = trim(mb_strtoupper(str_ireplace('ё', 'е', $region)));
-		// 	$region = str_ireplace ( ['РЕСП.', 'КРАЙ.', 'ОБЛ.'], ['РЕСПУБЛИКА', 'КРАЙ', 'ОБЛАСТЬ'], $region);
-		// 	$region = str_ireplace(['Г.', 'город'], '', $region);
-		// }
 		
-		
+		// преобразование поисковых города и региона
 		$city = $this->clearPlaceName($city);
 		if($region)
 		{
@@ -130,9 +161,12 @@ class PointCollection extends Collection
 				continue;
 			}
 			
+			// преобразование города и региона из цикла
 			$upperFormCity = $this->clearPlaceName($item->getFormCity());
 			$upperFormRegion = $this->clearPlaceName($item->getFormRegion());			
 			
+
+			// если что-то из них не указано - присвоить другому (правило для столиц)
 			if(empty($upperFormCity) && !empty($upperFormRegion))
 			{
 				$upperFormCity = $upperFormRegion;
@@ -143,7 +177,7 @@ class PointCollection extends Collection
 				$upperFormRegion = $upperFormCity;
 			}
 
-			
+			// получение коэффициентов подобия и сравнение с коэффициентом совпадения 
 			if($region)
 			{
 				similar_text($city, $upperFormCity, $percCity);
@@ -154,7 +188,8 @@ class PointCollection extends Collection
 					
 					$foundedCollection[] = $item;
 				}
-			}else {
+			}else 
+			{
 				similar_text($city, $upperFormCity, $percCity);
 				if($percCity > self::SIM_MIN_COEF)
 				{

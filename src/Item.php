@@ -109,10 +109,14 @@ class Item
 
     /**
      * Item constructor.
-     * @param string $productName
-     * @param float $weightLine
-     * @param float $amountLine
-     * @param float $statisticalValueLine
+     * @param string $productName наименование товара используется для передачи в ОФД (тег ФФД №1030)
+     * @param float $weightLine вес товара
+     * @param float $amountLine  стоимость товара используется для передачи в ОФД (тег ФФД 1043, 1079)
+     * @param float $statisticalValueLine оценочная стоимость
+     * @param string $ProductVariant   вариант товара (размер, цвет и т.д)
+     * @param int $itemType тип подробности заказа (Товар, Услуга, Сопроводительные документы, Дополнительные условия выдачи заказа), используйте http://list.iml.ru/Status c типом 39, чтобы понять какие значения может принимать это поле
+     * @param int $productNo номер товара (артикул)
+     * @param int $productBarCode штрих-код
      * @return Item
      */
     public function __construct(string $productName,float $weightLine,float $amountLine, float $statisticalValueLine = null,
@@ -182,10 +186,10 @@ class Item
 
     /**
      * код категории НДС
-     * @return int
+     * @return void
      */    
 
-    public function setVATRate($VATRate)
+    public function setVATRate(int $VATRate)
     {
         $this->VATRate = $VATRate;
     }

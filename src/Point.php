@@ -80,8 +80,13 @@ class Point extends BaseObject
         return $this->$prop;
     }
     
-    
-    public function getFormAddress(array $excludes = [])
+    /**
+     * получение строки адреса на основе Form-полей
+     *
+     * @param array $excludes Массив Form-полей, исключаемых при формировании строки адреса ПВЗ
+     * @return string
+     */
+    public function getFormAddress(array $excludes = []):string
     {
         $params = [
         'FormRegion',

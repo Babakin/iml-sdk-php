@@ -3,15 +3,18 @@
 
 namespace IMLSdk;
 
-
 class CityCollection extends Collection
-{
+{   
     protected $type = 'City';
-    // при сортировке по городу - столицы  в начале списка
-    private $setCapitalsAtBeginning = true;
 
-
-    private function cmpByCity($a, $b)
+    /**
+     * Функция сравнения двух городов для сортировки списка (приоритет - у столиц)
+     *
+     * @param [City] $a
+     * @param [City] $b
+     * @return int
+     */
+    private function cmpByCity(City $a, City $b):int
     {
 
 		$cityA = $a->City;
@@ -39,11 +42,13 @@ class CityCollection extends Collection
     }
 
 
-
-
-    public function sortByCity($setCapitalsAtBeginning)
+    /**
+     * Сортировка списка городов (сначала столицы, затем - алфавитный порядок)
+     *
+     * @return CityCollection
+     */
+    public function sortByCity()
     {
-        $this->setCapitalsAtBeginning = $setCapitalsAtBeginning;
 		uasort($this->collection, array($this, 'cmpByCity'));
 		return $this;
     }

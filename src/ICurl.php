@@ -18,7 +18,7 @@ interface ICurl
      * @param array $data
      * @return IMLResponse
      */
-    public function sendRequest(string $url, string $method, $login, $password ,array $data=[]) :IMLResponse;
+    public function sendRequest(string $url, string $method, string $login, string $password ,array $data=[]) :IMLResponse;
 
 
     /**

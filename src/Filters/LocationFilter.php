@@ -1,14 +1,18 @@
 <?php 
-
 namespace IMLSdk\Filters;
 
 class LocationFilter extends Filter
 {
 
-	public function filterCollection():array
+    /**
+     * Фильтрует склады из list.iml.ru/Location, поскольку некоторые из них не подходят для создания заказов
+     * @param array $collection фильтруемая коллекция
+     * @return array
+     */
+	public function filterCollection(array $collection):array
 	{
 		$newData = [];
-      	foreach ($this->collection as $location) {
+      	foreach ($collection as $location) {
 
           $upperRegionCode = mb_strtoupper($location['RegionCode'], 'UTF-8');
 
@@ -20,8 +24,6 @@ class LocationFilter extends Filter
               continue;
           }
 
-          //if ($location ['Submission'] != '')
-          //continue;
 
           if ($location['ReceiptOrder'] <= 0) {
               continue;

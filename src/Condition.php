@@ -21,44 +21,44 @@ class Condition extends BaseObject
      * поля с StatusType = 40
      * @var int
      */
-    private $productNo;
+    protected $productNo;
 
     /**
      * Если указано значение 1, то условие выдачи разрешено.
      * Если указано значение 0 – запрещено.
      * @var bool
      */
-    private $allowed = 1;
+    protected $allowed = 1;
 
     /**
      * Для определения условий выдачи всегда заполнять значением ‘10’.
      * @var int
      */
-    private $itemType = 10;
+    protected $itemType = 10;
 
     /**
      * Дополнительная информация, которую нужно принять к сведенью.
      * @var string
      */
-    private $itemNote;
+    protected $itemNote;
 
     /**
      * Имя условия выдачи
      * @var string
      */
-    private $name;
+    protected $name;
 
     /**
      * Описание типа выдачи
      * @var string
      */
-    private $statusTypeDescription;
+    protected $statusTypeDescription;
 
     /**
      * Описание
      * @var string
      */
-    private $description;
+    protected $description;
 
     /**
      * Создание обьекта по параметрам, полученным из api IML
@@ -87,6 +87,7 @@ class Condition extends BaseObject
 
 
     /**
+     * Разрешено ли свойство в данном заказе
      * @param bool $allowed
      * @return $this
      */
@@ -94,16 +95,5 @@ class Condition extends BaseObject
         $this->allowed = (int) $allowed;
         return $this;
     }
-    
-    
-    public function __get($property)
-    {
         
-        if (property_exists($this, $property)) 
-        {
-            return $this->$property;
-        }
-        
-    }
-    
 }

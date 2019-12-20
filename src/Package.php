@@ -133,7 +133,12 @@ class Package
         return $this->weightLine;
     }
     
-    
+    /**
+     * Указание веса грузового места
+     *
+     * @param float $weightLine
+     * @return void
+     */
     public function setWeightLine(float $weightLine){
         $this->weightLine = $weightLine;
     }    

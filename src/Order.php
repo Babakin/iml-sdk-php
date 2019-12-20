@@ -196,7 +196,7 @@ class Order
 
 
     /**
-     * @param string $barcode
+     * @param string $barcode штрих-код заказа
      * @return $this
      */
     public function setBarcode(string $barcode){
@@ -376,6 +376,12 @@ class Order
         }
     }
 
+    /**
+     * Добавить условия выдачи к заказу
+     *
+     * @param ConditionCollection $conditions коллекция условий выдачи
+     * @return void
+     */
     public function addConditions(ConditionCollection $conditions) {
         foreach ($conditions as $condition){
             $this->goodItems = array_merge($this->goodItems,[$condition->toArray()]);
@@ -400,9 +406,9 @@ class Order
 
 
     /**
-     * Добавляем услугу "Доставка" в заказ
-     * @param float $amountLine
-     * @return $this
+     * Добавляем услугу "Доставка" в заказ с указанием стоимости
+     * @param float $DeliveryCost Стоимость доставки
+     * @return void
      */
     public function setDeliveryCost(float $DeliveryCost)
     {
@@ -410,9 +416,12 @@ class Order
     }
 
 
+
     /**
-    * Включаем фулфилмент в заказе
-    **/
+     * Включаем фулфилмент в заказе
+     *
+     * @return void
+     */
     public function enableFullFilment()
     {
         $this->goodItems = array_merge($this->goodItems, ["productNo" => "10000", "itemType" => "14", "allowed" => "1", "productBarCode" => "00000"]);
@@ -421,6 +430,7 @@ class Order
 
 
     /**
+     * Указываем пункт выдачи для заказа
      * @param string $Code
      * @return $this
      */
