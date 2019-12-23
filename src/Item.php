@@ -101,20 +101,35 @@ class Item
 
 
     /**
+     * размер НДС в процентах.Может принимать значения указанные в справочнике http://list.iml.ru/Status с типом 52. Используется для передачи в ОФД
+     * @var int
+     */
+    protected $VATRate;
+
+
+    /**
      * Item constructor.
-     * @param string $productName
-     * @param float $weightLine
-     * @param float $amountLine
-     * @param float $statisticalValueLine
+     * @param string $productName наименование товара используется для передачи в ОФД (тег ФФД №1030)
+     * @param float $weightLine вес товара
+     * @param float $amountLine  стоимость товара используется для передачи в ОФД (тег ФФД 1043, 1079)
+     * @param float $statisticalValueLine оценочная стоимость
+     * @param string $ProductVariant   вариант товара (размер, цвет и т.д)
+     * @param int $itemType тип подробности заказа (Товар, Услуга, Сопроводительные документы, Дополнительные условия выдачи заказа), используйте http://list.iml.ru/Status c типом 39, чтобы понять какие значения может принимать это поле
+     * @param int $productNo номер товара (артикул)
+     * @param int $productBarCode штрих-код
      * @return Item
      */
-    public function __construct(string $productName,float $weightLine,float $amountLine, float $statisticalValueLine=null){
+    public function __construct(string $productName,float $weightLine,float $amountLine, float $statisticalValueLine = null,
+        string $ProductVariant = null, int $itemType = 0, int $productNo = null, int $productBarCode = null
+    ){
+        $this->ProductVariant = $ProductVariant;
+        $this->itemType = $itemType;  
         $this->productName = $productName;
         $this->weightLine = $weightLine;
         $this->amountLine = $amountLine;
         $this->statisticalValueLine = $statisticalValueLine;
-        $this->productNo = rand (10000, 99999);
-        $this->productBarCode = rand (10000000, 99999999);
+        $this->productNo = (is_null($productNo)) ? rand(10000, 99999) : $productNo;
+        $this->productBarCode = (is_null($productBarCode)) ? rand (10000000, 99999999) : $productBarCode;
         return $this;
     }
 
@@ -129,7 +144,10 @@ class Item
     public function __call($method, $args) {
         if (count($args)>1) throw new ExceptionIMLClient('Неверные параметры для свойства');
         $prop = $this->stringSplitCamelCase($method,'set');
-        if(!property_exists($this,$prop)) throw new ExceptionIMLClient('Неверное имя свойства');
+        if(!property_exists($this,$prop)) 
+        {
+            throw new ExceptionIMLClient('Неверное имя свойства');
+        }
         $this->$prop = $args[0];
         return $this;
     }
@@ -159,10 +177,20 @@ class Item
     }
 
     /**
-     * Наложенная стоисомть
+     * Наложенная стоимость
      * @return float
      */
     public function getStatisticalValueLine(){
         return $this->statisticalValueLine;
+    }
+
+    /**
+     * код категории НДС
+     * @return void
+     */    
+
+    public function setVATRate(int $VATRate)
+    {
+        $this->VATRate = $VATRate;
     }
 }

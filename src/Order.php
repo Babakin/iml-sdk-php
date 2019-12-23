@@ -13,6 +13,13 @@ class Order
     use SplitStringCamesCase;
 
     /**
+     * штрих-код заказа, созданного в системе IML
+     * @var string
+     */
+    protected $barcode;
+    
+    
+    /**
      * Job – услуга, Code из справочника услуг, находится по адресу http://list.iml.ru/service
      * @var string
      */
@@ -186,6 +193,17 @@ class Order
         return $this;
     }
 
+
+
+    /**
+     * @param string $barcode штрих-код заказа
+     * @return $this
+     */
+    public function setBarcode(string $barcode){
+        $this->barcode = $barcode;
+        return $this;
+    }
+
     /**
      * @param string $phone
      * @return $this
@@ -349,12 +367,22 @@ class Order
         /** @var Item $item **/
         foreach ($items as $item){
             $this->setItem($item);
-            $this->amount += $item->getAmount()*$item->getQuantity();
+            // если тип доставки связан с кассовым обслуживанием - заполнять Amount
+            if(in_array($this->job, [self::SELF_DELIVERY_CASH_SERVICE, self::DELIVERY_CASH_SERVICE]))
+            {
+                $this->amount += $item->getAmount()*$item->getQuantity();    
+            }
             $this->valuatedAmount += $item->getStatisticalValueLine()*$item->getQuantity();
         }
     }
 
-    public function addConditions(ConditionCollection $conditions) :void {
+    /**
+     * Добавить условия выдачи к заказу
+     *
+     * @param ConditionCollection $conditions коллекция условий выдачи
+     * @return void
+     */
+    public function addConditions(ConditionCollection $conditions) {
         foreach ($conditions as $condition){
             $this->goodItems = array_merge($this->goodItems,[$condition->toArray()]);
         }
@@ -367,6 +395,7 @@ class Order
         $this->goodItems = array_merge($this->goodItems,[$item->toArray()]);
     }
 
+
     /**
      * @return $this
      */
@@ -375,7 +404,33 @@ class Order
         return $this;
     }
 
+
     /**
+     * Добавляем услугу "Доставка" в заказ с указанием стоимости
+     * @param float $DeliveryCost Стоимость доставки
+     * @return void
+     */
+    public function setDeliveryCost(float $DeliveryCost)
+    {
+        $this->goodItems = array_merge($this->goodItems, ["productNo" => "Доставка", "itemType" => 3, "allowed" => 0, 'amountLine' => $DeliveryCost]);
+    }
+
+
+
+    /**
+     * Включаем фулфилмент в заказе
+     *
+     * @return void
+     */
+    public function enableFullFilment()
+    {
+        $this->goodItems = array_merge($this->goodItems, ["productNo" => "10000", "itemType" => "14", "allowed" => "1", "productBarCode" => "00000"]);
+    }
+
+
+
+    /**
+     * Указываем пункт выдачи для заказа
      * @param string $Code
      * @return $this
      */
@@ -392,7 +447,10 @@ class Order
      */
     public function __call($name, $arguments){
         $prop = $this->stringSplitCamelCase($name,'get');
-        if(!property_exists($this,$prop)) throw new ExceptionIMLClient('Неверное имя свойства');
+        if(!property_exists($this,$prop)) 
+            {
+                throw new ExceptionIMLClient('Неверное имя свойства');
+            }
         return $this->$prop;
     }
 }

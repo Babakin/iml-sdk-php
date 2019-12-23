@@ -1,0 +1,97 @@
+!_TAG_FILE_SORTED	2	/0=unsorted, 1=sorted, 2=foldcase/
+accurateResult	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $accurateResult = [];$/;"	v	language:PHP
+accurateResult	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $accurateResult = [];$/;"	v	language:PHP
+addConditions	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private function addConditions():void {$/;"	f	language:PHP
+baseUriActive	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $this->baseUriActive = IMLClient::BASE_URI;$/;"	v	language:PHP
+baseUriActive	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $this->baseUriActive = IMLClient::BASE_URI_TEST;$/;"	v	language:PHP
+baseUriActive	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public $baseUriActive;$/;"	v	language:PHP
+buildCollection	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private function buildCollection(array $data,string $type){$/;"	f	language:PHP
+calculate	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function calculate() :IMLResponse{$/;"	f	language:PHP
+checkAuth	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private function checkAuth(){$/;"	f	language:PHP
+checkOrder	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private function checkOrder(){$/;"	f	language:PHP
+cities	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $this->cities = $this->factory->getCollection('City');$/;"	v	language:PHP
+cities	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private $cities;$/;"	v	language:PHP
+clearPlaceName	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private function clearPlaceName($placeName)$/;"	f	language:PHP
+collection	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $collection = $this->factory->getCollection($type);$/;"	v	language:PHP
+conditions	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^                $this->conditions = $this->buildCollection($data,'Condition');$/;"	v	language:PHP
+conditions	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $this->conditions = $this->factory->getCollection('Condition');$/;"	v	language:PHP
+conditions	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private $conditions;$/;"	v	language:PHP
+connectTimeout	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $this->connectTimeout = $connectTimeout;$/;"	v	language:PHP
+connectTimeout	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private $connectTimeout = 0;$/;"	v	language:PHP
+createOrder	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function createOrder():IMLResponse{$/;"	f	language:PHP
+curl	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $this->curl = $curl;$/;"	v	language:PHP
+curl	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $this->curl = $this->factory->getCurl();$/;"	v	language:PHP
+curl	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private $curl;$/;"	v	language:PHP
+curlDebugMode	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function curlDebugMode(bool $debug): void{$/;"	f	language:PHP
+data	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^                $data = [];$/;"	v	language:PHP
+data	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^                $data = [];$/;"	v	language:PHP
+factory	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $this->factory = $factory;$/;"	v	language:PHP
+factory	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private $factory;$/;"	v	language:PHP
+factoryMethod	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $factoryMethod = 'get'.$type;$/;"	v	language:PHP
+getConditions	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function getConditions(){$/;"	f	language:PHP
+getDeliveryPointsCollection	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function getDeliveryPointsCollection($sdType = null, $RegionCode =  null):PointCollection{$/;"	f	language:PHP
+getItem	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function getItem(string $productName,float $weightLine,float $amountLine, float $statisticalValueLine=null):Item{$/;"	f	language:PHP
+getLocationCollection	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function getLocationCollection()$/;"	f	language:PHP
+getOrderBarcodesInPdfFormat	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function getOrderBarcodesInPdfFormat($imlBarCode)$/;"	f	language:PHP
+getOrderInstance	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function getOrderInstance(string $job=null) :Order{$/;"	f	language:PHP
+getPackageInstance	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function getPackageInstance(){$/;"	f	language:PHP
+getPointByCode	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function getPointByCode(string $Code) :Point{$/;"	f	language:PHP
+getPointsByRegionCode	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function getPointsByRegionCode(string $code) :PointCollection{$/;"	f	language:PHP
+getRegionByCity	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function getRegionByCity(string $city){$/;"	f	language:PHP
+getRegionByCityRegion	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function getRegionByCityRegion(string $city, string $region){$/;"	f	language:PHP
+getRegionCityCollection	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function getRegionCityCollection()$/;"	f	language:PHP
+getStatusOrder	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function getStatusOrder($imlBarCode) :IMLResponse$/;"	f	language:PHP
+getVatVariants	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function getVatVariants()$/;"	f	language:PHP
+IMLClient	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^class IMLClient implements ICurlInject$/;"	c	language:PHP
+injectCurl	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function injectCurl(ICurl $curl) :void {$/;"	f	language:PHP
+isAuth	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function isAuth(){$/;"	f	language:PHP
+isTestMode	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $this->isTestMode = true;$/;"	v	language:PHP
+isTestMode	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private $isTestMode = false;$/;"	v	language:PHP
+levCity	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^            $levCity = levenshtein($this->clearPlaceName($city), $this->clearPlaceName($reg['City']));$/;"	v	language:PHP
+levCity	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^            $levCity = levenshtein(mb_strtolower($city), mb_strtolower($reg['City']));$/;"	v	language:PHP
+levRegion	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^            $levRegion = levenshtein($this->clearPlaceName($region), $this->clearPlaceName($reg['Region']));$/;"	v	language:PHP
+login	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $this->login = $login;$/;"	v	language:PHP
+login	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private $login;$/;"	v	language:PHP
+logIn	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function logIn(string $login, string $password){$/;"	f	language:PHP
+order	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $order = $this->factory->getOrder();$/;"	v	language:PHP
+order	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $this->order = $order;$/;"	v	language:PHP
+order	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private $order;$/;"	v	language:PHP
+params	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^            $params = compact('sdType', 'RegionCode');$/;"	v	language:PHP
+paramsStr	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^            $paramsStr = implode("&", $params);$/;"	v	language:PHP
+password	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $this->password = $password;$/;"	v	language:PHP
+password	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private $password;$/;"	v	language:PHP
+pdfData	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $pdfData = $this->request("\/Json\/PrintBar?Barcode={$imlBarCode}", 'GET', [], false, false);$/;"	v	language:PHP
+placeName	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^         $placeName = str_ireplace ([' РЕСП.', ' КРАЙ.', ' ОБЛ.'], [' РЕСПУБЛИКА', ' КРАЙ', ' ОБЛАСТЬ'], $placeName);$/;"	v	language:PHP
+placeName	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^         $placeName = str_ireplace([' Г.', ' город'], '', $placeName);   $/;"	v	language:PHP
+placeName	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^         $placeName = trim(mb_strtoupper(str_ireplace('ё', 'е', $placeName)));$/;"	v	language:PHP
+points	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $points = $this->getDeliveryPoints();$/;"	v	language:PHP
+points	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $this->points = $this->factory->getCollection('Point');$/;"	v	language:PHP
+points	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private $points;$/;"	v	language:PHP
+request	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function request(string $uri, string $method = 'GET',array $data=[],$listUri = false, $convertResultFromJson = true) :IMLResponse$/;"	f	language:PHP
+requestListData	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private function requestListData(string $uri, string $method = 'GET',array $data=[]) :IMLResponse$/;"	f	language:PHP
+requestStr	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^            $requestStr = ($paramsStr) ? 'sd?'.$paramsStr : 'sd';$/;"	v	language:PHP
+response	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^                $response = $this->requestListData('Status?type=json', 'GET', []);$/;"	v	language:PHP
+response	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^                $response = $this->requestListData('Status?type=json', 'GET', []);$/;"	v	language:PHP
+response	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^            $response =  $this->requestListData($requestStr,'GET',[]);$/;"	v	language:PHP
+response	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^            $response = $this->curl->sendRequest($this->baseUriActive.'\/'.'v5\/GetPrice', 'POST', $this->login, $this->password, ['weigth'=>2.3]);$/;"	v	language:PHP
+response	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $response =  $this->request('sd?RegionCode='.$code,'GET',[],true);$/;"	v	language:PHP
+response	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $response = $this->requestListData('Location?type=json');$/;"	v	language:PHP
+response	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $response = $this->requestListData('RegionCity?type=json');$/;"	v	language:PHP
+response	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $response = $this->requestListData('RegionCity?type=json', 'GET', []);$/;"	v	language:PHP
+response	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $response = $this->requestListData('RegionCity?type=json', 'GET', []);$/;"	v	language:PHP
+result	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $result = [];$/;"	v	language:PHP
+result	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $result = [];$/;"	v	language:PHP
+resultData	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^            $resultData = (new PickPointsFilter($response->getContent()))->filterCollection();        $/;"	v	language:PHP
+resultData	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $resultData = (new LocationFilter($response->getContent()))->filterCollection();        $/;"	v	language:PHP
+sendOrder	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private function sendOrder(string $uri):IMLResponse{$/;"	f	language:PHP
+setConnectTimeout	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function setConnectTimeout(float $connectTimeout)$/;"	f	language:PHP
+setOrder	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function setOrder(Order $order){$/;"	f	language:PHP
+shortest	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $shortest = 2;$/;"	v	language:PHP
+shortest	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $shortest = 2;$/;"	v	language:PHP
+testMode	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function testMode() :IMLClient{$/;"	f	language:PHP
+unauthorized	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^                $this->unauthorized = false;$/;"	v	language:PHP
+unauthorized	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private $unauthorized = true;$/;"	v	language:PHP
+vatVariants	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^                $this->vatVariants = $this->buildCollection($data,'Condition');$/;"	v	language:PHP
+vatVariants	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^        $this->vatVariants = $this->factory->getCollection('Condition');$/;"	v	language:PHP
+vatVariants	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    private $vatVariants;$/;"	v	language:PHP
+__construct	/home/kirill/repos/opencart/opencart30.iml.ru/opencart_data/system/library/iml-sdk-php/src/IMLClient.php	/^    public function __construct(Factory $factory){$/;"	f	language:PHP

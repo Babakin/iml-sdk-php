@@ -22,6 +22,7 @@ class Point extends BaseObject
     protected $FittingRoom;
     protected $PaymentCard;
     protected $PaymentPossible;
+    protected $PaymentType;
     protected $ReceiptOrder;
     protected $Latitude;
     protected $Longitude;
@@ -79,8 +80,13 @@ class Point extends BaseObject
         return $this->$prop;
     }
     
-    
-    public function getFormAddress()
+    /**
+     * получение строки адреса на основе Form-полей
+     *
+     * @param array $excludes Массив Form-полей, исключаемых при формировании строки адреса ПВЗ
+     * @return string
+     */
+    public function getFormAddress(array $excludes = []):string
     {
         $params = [
         'FormRegion',
@@ -94,7 +100,7 @@ class Point extends BaseObject
         
         $formatAr = [];
         foreach ($params as $param) {
-            if($this->$param)
+            if(!in_array($param, $excludes) && $this->$param)
             {
                 $formatAr[] = $this->$param;    
             }

@@ -4,7 +4,7 @@
 namespace IMLSdk;
 
 
-abstract class BaseObject
+class BaseObject
 {
     /**
      * @param array $data
@@ -21,5 +21,19 @@ abstract class BaseObject
         }
         return $object;
     }
+
+    
+    /**
+     * @return string
+     */
+    public function __get($property)
+    {
+        
+        if (property_exists($this, $property)) 
+        {
+            return $this->$property;
+        }
+        
+    }    
 
 }

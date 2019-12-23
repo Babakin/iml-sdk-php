@@ -12,8 +12,13 @@ class PickPointChecker
         $this->federalCities = $federalCities;
     }
 
-
-    public function isCorrectPickpoint(&$pickpoint)
+    /**
+     * Проверка корректности данных у ПВЗ
+     *
+     * @param [array] $pickpoint Массив полей по ПВЗ
+     * @return boolean
+     */
+    public function isCorrectPickpoint(array &$pickpoint):bool
     {
         $restrictedIDs = ['1001454', '1000607'];
 
@@ -56,8 +61,13 @@ class PickPointChecker
         return true;
     }
 
-
-    public function isDepartureC2C($pickpoint)
+    /**
+     * Проверка, что ПВЗ принимает заказы для отправки по С2С
+     *
+     * @param [array] $pickpoint
+     * @return boolean
+     */
+    public function isDepartureC2C(array $pickpoint):bool
     {
         return $pickpoint['ReceiptOrder'] == 2 || $pickpoint['ReceiptOrder'] == 7;
     }
