@@ -22,6 +22,7 @@ class IMLResponse
      */
     public $content;
 
+
     /**
      * IMLResponse constructor.
      * @param string $title

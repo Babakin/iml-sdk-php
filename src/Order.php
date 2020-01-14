@@ -10,13 +10,13 @@ namespace IMLSdk;
 class Order
 {
     use ObjectToArrayTrait;
-    use SplitStringCamesCase;
+    use ObjectGetterMethodTrait;
 
     /**
      * штрих-код заказа, созданного в системе IML
      * @var string
      */
-    protected $barcode;
+    protected $barCode;
     
     
     /**
@@ -196,12 +196,41 @@ class Order
 
 
     /**
-     * @param string $barcode штрих-код заказа
+     * @param string $barCode штрих-код заказа
      * @return $this
      */
-    public function setBarcode(string $barcode){
-        $this->barcode = $barcode;
+    public function setbarCode(string $barCode){
+        $this->barCode = $barCode;
         return $this;
+    }
+
+    /**
+     * @param float $weight вес заказа
+     * @return $this
+     */
+    public function setWeight(float $weight){
+        $this->weight = $weight;
+        return $this;
+    }
+
+    public function setVolume(int $vol){
+        $this->volume = $vol;
+        return $this;
+    }
+
+    /**
+     * @throws ExceptionIMLClient
+     */
+    public function checkWeight(){
+        if(!$this->weight) throw new ExceptionIMLClient('Вес заказа не может быть нулевым');
+    }
+
+
+    /**
+     * @throws ExceptionIMLClient
+     */
+    public function checkVolume(){
+        if($this->volume == 0) throw new ExceptionIMLClient('Количество грузовых мест volume не может быть меньше 1');
     }
 
     /**
@@ -231,10 +260,10 @@ class Order
     }
 
     /**
-     * @param $customerOrder
+     * @param string $customerOrder
      * @return $this
      */
-    public function setCustomerOrder($customerOrder){
+    public function setCustomerOrder(string $customerOrder){
         $this->customerOrder = $customerOrder;
         return $this;
     }
@@ -424,9 +453,8 @@ class Order
      */
     public function enableFullFilment()
     {
-        $this->goodItems = array_merge($this->goodItems, ["productNo" => "10000", "itemType" => "14", "allowed" => "1", "productBarCode" => "00000"]);
+        $this->goodItems = array_merge($this->goodItems, ["productNo" => "10000", "itemType" => "14", "allowed" => "1", "productbarCode" => "00000"]);
     }
-
 
 
     /**
@@ -439,18 +467,24 @@ class Order
         return $this;
     }
 
+
     /**
-     * @param $name
-     * @param $arguments
-     * @return mixed
-     * @throws ExceptionIMLClient
+     * Собирает Order из ответа api.iml.ru
+     * @param IMLResponse $response
+     * @return Order|null
      */
-    public function __call($name, $arguments){
-        $prop = $this->stringSplitCamelCase($name,'get');
-        if(!property_exists($this,$prop)) 
-            {
-                throw new ExceptionIMLClient('Неверное имя свойства');
+    public function newOrderFromResponse(IMLResponse $response) :?Order{
+        if($response->statusCode == 200 && isset($response->getContent()['Order'])){
+            $oderAr = $response->getContent()['Order'];
+            $newOrder = new self();
+            foreach (array_keys($oderAr) as $prop){
+                $propNewOrder = lcfirst($prop);
+                if(in_array($prop,get_object_vars($this))){
+                    $newOrder->$propNewOrder = $oderAr[$prop];
+                }
             }
-        return $this->$prop;
+            return $newOrder;
+        }
+        return null;
     }
 }

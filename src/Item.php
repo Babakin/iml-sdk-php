@@ -7,7 +7,7 @@ namespace IMLSdk;
 class Item
 {
     use ObjectToArrayTrait;
-    use SplitStringCamesCase;
+    use ObjectGetterMethodTrait;
 
     /**
      * Наименование позиции
@@ -130,25 +130,6 @@ class Item
         $this->statisticalValueLine = $statisticalValueLine;
         $this->productNo = (is_null($productNo)) ? rand(10000, 99999) : $productNo;
         $this->productBarCode = (is_null($productBarCode)) ? rand (10000000, 99999999) : $productBarCode;
-        return $this;
-    }
-
-    /**
-     * Для назначения свойства объекта используйте set[Название свойства CamelCase].
-     * Метод перехватывает определение свойства.
-     * @param $method
-     * @param $args
-     * @return $this
-     * @throws ExceptionIMLClient
-     */
-    public function __call($method, $args) {
-        if (count($args)>1) throw new ExceptionIMLClient('Неверные параметры для свойства');
-        $prop = $this->stringSplitCamelCase($method,'set');
-        if(!property_exists($this,$prop)) 
-        {
-            throw new ExceptionIMLClient('Неверное имя свойства');
-        }
-        $this->$prop = $args[0];
         return $this;
     }
 

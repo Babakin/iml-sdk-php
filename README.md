@@ -87,7 +87,7 @@ CityCollection {#17 ▼
 Далее регион можем получить так:
 ```php
 //first() вернет первый элемент коллекции
-$region = $cityCollection->first()->getRegion();
+$region = $cityCollection->first()->getRegionIML();
 ```
 Результатом будет регион доставки, который можно передавать в заказ `$order->regionCodes('МОСКВА',$region);`
 ```json
@@ -96,7 +96,7 @@ $region = $cityCollection->first()->getRegion();
 Метод `->getRegionByCity(string $city)` возвращает коллекцию, в которой может быть не один обьект `City`.
 Пример:
 ```php
-$imlClient->getRegionByCity('Алексеевка')
+$imlClient->getRegionByCity('Алексеевка');
 ```
 Так как Алексеевок много он вернет все варианты:
 ```editorconfig
@@ -223,7 +223,7 @@ $responseOrder = $client->createOrder();
 ```
 
 Для расчета стоимости `$client->calculate()` и создания заказа `$client->createOrder()` необходимо создать грузовые места и товарные 
-вложения этих грузовых мест (передача пустого грузового места приведет к ошибке).
+вложения этих грузовых мест.
 Создаем товарное вложение с параметрами: Название, Вес, Стоимость и Наложенная стоимость (не обязательный):
 ```php
 $item = new \IMLSdk\Item('Семена Цветной капусты СКАЙВОКЕР',2.3,1000,1000);
@@ -259,6 +259,11 @@ $pack->setPackageDimensions(2000,2000,2000);
 ```php
 $order->setPackage($pack); //$pack2,$pack3...
 ```
+Если по каким либо причинам добавлять грузовые места не нужно, обязательно нужно указать вес и грузовые места без подробностей:
+```php
+//вес в кг
+$order->setWeight(1.2)->setVolume(1);
+```
 Добавляем данные заказа:
 ```php
 $imlClient->setOrder($order);
@@ -268,6 +273,16 @@ $imlClient->setOrder($order);
 ```php
 $responsePrice = $client->calculate();
 $responseOrder = $client->createOrder();
+```
+Получить объект нового заказа. Вернет `null` если в ответе не окажется заказа
+```php
+$newOrder = $order->newOrderFromResponse($responseOrder);
+```
+
+После создания заказа можно проверять их статус - пакетно, либо по одному:
+```php
+$statuses = $client->getStatusesOrders(['7500843104413','7500843199211','7500843241712']);
+$status = $client->getStatusOrder('7500843104413');
 ```
 
 

@@ -6,6 +6,7 @@ namespace IMLSdk;
 
 class City extends BaseObject
 {
+    use ObjectGetterMethodTrait;
     /**
      * @var string
      */

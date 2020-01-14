@@ -68,16 +68,21 @@ class Point extends BaseObject
     }
 
     /**
-     * @param $name
+     * @param $method
      * @param $arguments
      * @return mixed
      * @throws ExceptionIMLClient
      */
-    public function __call($name, $arguments){
-        $prop = $this->stringSplitCamelCase($name,'get');
-        $prop = ucfirst($prop);
-        if(!property_exists($this,$prop)) throw new ExceptionIMLClient('Неверное имя свойства');
-        return $this->$prop;
+    public function __call($method, $arguments){
+        $prop = $this->stringSplitCamelCase($method,'get');
+        if(property_exists($this,ucfirst($prop))){
+            $prop = ucfirst($prop);
+            return $this->$prop;
+        }elseif (property_exists($this,$prop)){
+            return $this->$prop;
+        }else{
+            throw new ExceptionIMLClient('Неверное имя свойства');
+        }
     }
     
     /**

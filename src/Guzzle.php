@@ -73,14 +73,15 @@ class Guzzle implements ICurl
         $content = json_decode($response->getBody()->getContents(),true);
         return new IMLResponse($response->getReasonPhrase(),$response->getStatusCode(),$content);
     }
-    
-    
+
+
     /** Запрос без авторизации по логину и паролю (специально для https://list.iml.ru)
      * @param string $url
      * @param string $method
      * @param array $data
      * @return IMLResponse
      * @throws ExceptionIMLClient
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function sendNonAuthRequest(string $url, string $method = 'GET', array $data=[]) :IMLResponse{
         try{

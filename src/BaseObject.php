@@ -4,13 +4,14 @@
 namespace IMLSdk;
 
 
-class BaseObject
+abstract class BaseObject
 {
     /**
      * @param array $data
      * @return mixed
      */
-    public function init(array $data) :BaseObject{
+    public function init(array $data) :BaseObject
+    {
         $object = new static();
         $data = (array)$data;
         $keys = array_keys($data);
@@ -28,12 +29,9 @@ class BaseObject
      */
     public function __get($property)
     {
-        
         if (property_exists($this, $property)) 
         {
             return $this->$property;
         }
-        
-    }    
-
+    }
 }
