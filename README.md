@@ -191,13 +191,13 @@ $conditionCollection->first()->allowed(false);
      * @throws ExceptionIMLClient
      */
 //Получаем все возможные ПВЗ
-$client->getDeliveryPoints();
+$imlClient->getDeliveryPoints();
 
 //Получить ПВЗ определенного региона
 $pointCollection = $imlClient->getPointsByRegionCode('ИРКУТСК');
 
 //Получаем определенную ПВЗ по коду из справочника 
-$pointCollection = $client->getPointByCode('АНАПА_ПС3');
+$pointCollection = $imlClient->getPointByCode('АНАПА_ПС3');
 
 ```
 ***Внимание!! Услуги передаются кириллицей!***
@@ -217,9 +217,9 @@ $order->regionCodes('МОСКВА');
 И далее:
 
 ```php
-$client->setOrder($order);
-$responsePrice = $client->calculate();
-$responseOrder = $client->createOrder();
+$imlClient->setOrder($order);
+$responsePrice = $imlClient->calculate();
+$responseOrder = $imlClient->createOrder();
 ```
 
 Для расчета стоимости `$client->calculate()` и создания заказа `$client->createOrder()` необходимо создать грузовые места и товарные 
@@ -271,8 +271,8 @@ $imlClient->setOrder($order);
 #
 Считаем и создаем заказ в IML:
 ```php
-$responsePrice = $client->calculate();
-$responseOrder = $client->createOrder();
+$responsePrice = $imlClient->calculate();
+$responseOrder = $imlClient->createOrder();
 ```
 Получить объект нового заказа. Вернет `null` если в ответе не окажется заказа
 ```php
@@ -281,8 +281,8 @@ $newOrder = $order->newOrderFromResponse($responseOrder);
 
 После создания заказа можно проверять их статус - пакетно, либо по одному:
 ```php
-$statuses = $client->getStatusesOrders(['7500843104413','7500843199211','7500843241712']);
-$status = $client->getStatusOrder('7500843104413');
+$statuses = $imlClient->getStatusesOrders(['7500843104413','7500843199211','7500843241712']);
+$status = $imlClient->getStatusOrder('7500843104413');
 //история изменений статуса по заказу
 $statusHistory = $imlClient->getHistoryStatus(7500843104413);
 ```
