@@ -376,6 +376,13 @@ class IMLClient implements ICurlInject
         return $this->getStatusOrder(mb_substr($queryBarCodes, 0, -1));
     }
 
+
+    /**
+     * История изменений статуса заказа
+     * @param string $barcode
+     * @return IMLResponse
+     * @throws ExceptionIMLClient
+     */
     public function getHistoryStatus(string $barcode) :IMLResponse{
         $url = 'Api/Main/'.$barcode;
         return $this->request($url, 'GET', [], false, false,false,true);
