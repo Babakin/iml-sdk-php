@@ -283,6 +283,8 @@ $newOrder = $order->newOrderFromResponse($responseOrder);
 ```php
 $statuses = $client->getStatusesOrders(['7500843104413','7500843199211','7500843241712']);
 $status = $client->getStatusOrder('7500843104413');
+//история изменений статуса по заказу
+$statusHistory = $imlClient->getHistoryStatus(7500843104413);
 ```
 
 

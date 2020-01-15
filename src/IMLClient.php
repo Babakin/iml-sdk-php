@@ -94,6 +94,8 @@ class IMLClient implements ICurlInject
 
     const BASE_URI_LIST = 'http://list.iml.ru';
 
+    const BASE_URI_STATUS = 'http://status.iml.ru';
+
 
     // timeout на время соединения с сервером API
     private $connectTimeout = 0;
@@ -175,10 +177,11 @@ class IMLClient implements ICurlInject
      * @param bool $listUri используется для получения данных из IML list
      * @param bool $convertResultFromJson Включить конвертирование ответа из json
      * @param bool $withoutAuth ключ для запросов не требующих авторизации
+     * @param bool $statusUrl ключ для запроса урла статусов
      * @return IMLResponse
      * @throws ExceptionIMLClient
      */
-    public function request(string $uri, string $method = 'GET',array $data=[], bool $listUri = false, bool $convertResultFromJson = true,bool $withoutAuth = false) :IMLResponse{
+    public function request(string $uri, string $method = 'GET',array $data=[], bool $listUri = false, bool $convertResultFromJson = true,bool $withoutAuth = false, bool $statusUrl = false) :IMLResponse{
         if(!$this->curl) 
         {
             throw new ExceptionIMLClient('Object ICUrl not found, use injectCurl method for injection');
@@ -188,9 +191,11 @@ class IMLClient implements ICurlInject
         }
 
         try{
-            if($listUri)
-            {
+            if($listUri){
                 return $this->curl->sendRequest(self::BASE_URI_LIST .'/'.$uri, $method, $this->login, $this->password, $data, $convertResultFromJson, $this->connectTimeout);
+            }
+            if($statusUrl){
+                return $this->curl->sendRequest(self::BASE_URI_STATUS .'/'.$uri, $method, $this->login, $this->password, $data, $convertResultFromJson, $this->connectTimeout);
             }
             return $this->curl->sendRequest($this->baseUriActive.'/'.$uri, $method, $this->login, $this->password, $data, $convertResultFromJson, $this->connectTimeout);
         }catch (Exception $exception){
@@ -363,12 +368,17 @@ class IMLClient implements ICurlInject
      * @return IMLResponse
      * @throws ExceptionIMLClient
      */
-    public function getStatusesOrders(array $imlBarCodes){
+    public function getStatusesOrders(array $imlBarCodes) :IMLResponse{
         $queryBarCodes = '';
         foreach ($imlBarCodes as $barcode){
             $queryBarCodes .= $barcode.'|';
         }
         return $this->getStatusOrder(mb_substr($queryBarCodes, 0, -1));
+    }
+
+    public function getHistoryStatus(string $barcode) :IMLResponse{
+        $url = 'Api/Main/'.$barcode;
+        return $this->request($url, 'GET', [], false, false,false,true);
     }
 
 
