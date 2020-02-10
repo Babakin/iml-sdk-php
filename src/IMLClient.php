@@ -562,6 +562,15 @@ class IMLClient implements ICurlInject
     }
 
     /**
+     * справочник почтовых индексов
+     * @return IMLResponse
+     * @throws ExceptionIMLClient
+     */
+    public function getPostIndexes(){
+        return $this->requestListData('PostCode?type=json');
+    }
+
+    /**
      * Получить список населенных пунктов для доставки курьером
      *
      * @return CityCollection
