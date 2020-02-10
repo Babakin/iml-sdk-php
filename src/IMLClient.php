@@ -559,8 +559,17 @@ class IMLClient implements ICurlInject
      * @throws ExceptionIMLClient
      */
     public function getRegionCityCollection():CityCollection{
-        $response = $this->requestListData('RegionCity?type=json');
+        $response = $this->getRegionCity();
         return $this->buildCollection($response->getContent(),'City');
+    }
+
+    /**
+     * Получить список населенных пунктов
+     * @return IMLResponse
+     * @throws ExceptionIMLClient
+     */
+    public function getRegionCity():IMLResponse{
+        return $this->requestListData('RegionCity?type=json');
     }
 
     /**
